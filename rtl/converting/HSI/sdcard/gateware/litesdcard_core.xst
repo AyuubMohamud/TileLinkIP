@@ -1,0 +1,9 @@
+run
+-ifn litesdcard_core.prj
+-top litesdcard_core
+-ifmt MIXED
+-use_new_parser yes
+-opt_mode SPEED
+-register_balancing yes
+-ofn litesdcard_core.ngc
+-p 
