@@ -1,0 +1,5 @@
+module DMACore (
+    
+);
+    
+endmodule

@@ -2,7 +2,7 @@
 // Licensed under CERN-OHL-W version 2
 `include "clint_defines.sv"
 
-module polaris_clint #(parameter HARTNO = 2) (
+module openPolarisCLINT #(parameter HARTNO = 2) (
     input   wire logic                      clint_clk_i,
     input   wire logic                      clint_rst_i,
 
