@@ -12,19 +12,10 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with tlautogen. If not, see
 <https://www.gnu.org/licenses/>.
 """
-import TileLink1toN as tl1tN
+import sys
+version = 0.1
+def copyright() -> None:
+    print(f"""tlautogen {version} \nCopyright (C) 2023 Ayuub Mohamud.\nThis is free software; see the source for copying conditions. There is NO\nwarranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.""")
 
-
-
-    
-
-
-"""def generateMto1(NoM: int, timeout: int, address_width: int, lgb2dw: int) -> str:
-    if (NoM < 2): 
-        print("Number of masters must be greater than 1 to generate M to 1 arbiter")
-        return ""
-
-def generateMtoN(NoM: int, NoS: int, timeout: int, address_width: int, lgb2dw: int, slave_address: list, slave_end_address: list) -> str: 
-    if (NoM < 2) or (NoS<2):
-        print("Number of masters or slaves to few to generate crossbar interconnect")
-        return """""    
+copyright()
+print(f"\n\n\ntlautogen: Generating SOC from specified file {sys.argv[1]}")
