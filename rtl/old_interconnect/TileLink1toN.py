@@ -182,6 +182,7 @@ module TileLink1toN #(
     logic [(2**TL_DW)-1:0] resp_data;
     logic resp_denied;
     logic resp_corrupt;
+    /* openPolaris_select priority_encoder */
     always_comb begin
         bitscan = 'x;
         once = 'x;

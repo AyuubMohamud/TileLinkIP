@@ -1,0 +1,22 @@
+[options]
+mode prove
+depth 10
+[engines]
+smtbmc
+[script]
+read -formal openPolarisUART.sv
+read -formal tlul_slave_formal.sv
+read -sv uart_rx.sv
+read -sv uart_tx.sv
+read -sv sfifo.sv
+read -sv skdbf.sv
+read -sv polaris_uart_ip.sv
+prep -top openPolarisUART
+[files]
+skdbf.sv
+openPolarisUART.sv
+uart_rx.sv
+uart_tx.sv
+sfifo.sv
+polaris_uart_ip.sv
+tlul_slave_formal.sv

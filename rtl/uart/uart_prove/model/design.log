@@ -1,0 +1,1308 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.34+43 (git sha1 d21c464ae, clang 10.0.0-4ubuntu1 -fPIC -Os)
+
+
+-- Executing script file `../model/design.ys' --
+
+1. Executing Verilog-2005 frontend: openPolarisUART.sv
+Parsing formal SystemVerilog input from `openPolarisUART.sv' to AST representation.
+Storing AST representation for module `$abstract\openPolarisUART'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: tlul_slave_formal.sv
+Parsing formal SystemVerilog input from `tlul_slave_formal.sv' to AST representation.
+Storing AST representation for module `$abstract\tlul_slave_formal'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: uart_rx.sv
+Parsing SystemVerilog input from `uart_rx.sv' to AST representation.
+Storing AST representation for module `$abstract\uart_rx'.
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: uart_tx.sv
+Parsing SystemVerilog input from `uart_tx.sv' to AST representation.
+Storing AST representation for module `$abstract\uart_tx'.
+Successfully finished Verilog frontend.
+
+5. Executing Verilog-2005 frontend: sfifo.sv
+Parsing SystemVerilog input from `sfifo.sv' to AST representation.
+Storing AST representation for module `$abstract\sfifo'.
+Successfully finished Verilog frontend.
+
+6. Executing Verilog-2005 frontend: skdbf.sv
+Parsing SystemVerilog input from `skdbf.sv' to AST representation.
+Storing AST representation for module `$abstract\skdbf'.
+Successfully finished Verilog frontend.
+
+7. Executing Verilog-2005 frontend: polaris_uart_ip.sv
+Parsing SystemVerilog input from `polaris_uart_ip.sv' to AST representation.
+Storing AST representation for module `$abstract\polaris_uart_ip'.
+Successfully finished Verilog frontend.
+
+8. Executing PREP pass.
+
+8.1. Executing HIERARCHY pass (managing design hierarchy).
+
+8.2. Executing AST frontend in derive mode using pre-parsed AST for module `\openPolarisUART'.
+Generating RTLIL representation for module `\openPolarisUART'.
+
+8.2.1. Analyzing design hierarchy..
+Top module:  \openPolarisUART
+Parameter \AW = 4
+Parameter \RS = 4
+Parameter \MAX = 10
+
+8.2.2. Executing AST frontend in derive mode using pre-parsed AST for module `\tlul_slave_formal'.
+Parameter \AW = 4
+Parameter \RS = 4
+Parameter \MAX = 10
+Generating RTLIL representation for module `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal'.
+
+8.2.3. Executing AST frontend in derive mode using pre-parsed AST for module `\polaris_uart_ip'.
+Generating RTLIL representation for module `\polaris_uart_ip'.
+Parameter 1 (\DW) = 51
+
+8.2.4. Executing AST frontend in derive mode using pre-parsed AST for module `\skdbf'.
+Parameter 1 (\DW) = 51
+Generating RTLIL representation for module `$paramod\skdbf\DW=s32'00000000000000000000000000110011'.
+
+8.2.5. Analyzing design hierarchy..
+Top module:  \openPolarisUART
+Used module:     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal
+Used module:     \polaris_uart_ip
+Used module:     $paramod\skdbf\DW=s32'00000000000000000000000000110011
+Parameter \FW = 32
+Parameter \DW = 8
+
+8.2.6. Executing AST frontend in derive mode using pre-parsed AST for module `\sfifo'.
+Parameter \FW = 32
+Parameter \DW = 8
+Generating RTLIL representation for module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+
+8.2.7. Executing AST frontend in derive mode using pre-parsed AST for module `\uart_tx'.
+Generating RTLIL representation for module `\uart_tx'.
+Parameter \FW = 32
+Parameter \DW = 8
+Found cached RTLIL representation for module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+
+8.2.8. Executing AST frontend in derive mode using pre-parsed AST for module `\uart_rx'.
+Generating RTLIL representation for module `\uart_rx'.
+
+8.2.9. Analyzing design hierarchy..
+Top module:  \openPolarisUART
+Used module:     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal
+Used module:     \polaris_uart_ip
+Used module:         $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo
+Used module:         \uart_tx
+Used module:         \uart_rx
+Used module:     $paramod\skdbf\DW=s32'00000000000000000000000000110011
+
+8.2.10. Analyzing design hierarchy..
+Top module:  \openPolarisUART
+Used module:     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal
+Used module:     \polaris_uart_ip
+Used module:         $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo
+Used module:         \uart_tx
+Used module:         \uart_rx
+Used module:     $paramod\skdbf\DW=s32'00000000000000000000000000110011
+Removing unused module `$abstract\polaris_uart_ip'.
+Removing unused module `$abstract\skdbf'.
+Removing unused module `$abstract\sfifo'.
+Removing unused module `$abstract\uart_tx'.
+Removing unused module `$abstract\uart_rx'.
+Removing unused module `$abstract\tlul_slave_formal'.
+Removing unused module `$abstract\openPolarisUART'.
+Removed 7 unused modules.
+Module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal directly or indirectly contains formal properties -> setting "keep" attribute.
+Module openPolarisUART directly or indirectly contains formal properties -> setting "keep" attribute.
+Mapping positional arguments of cell polaris_uart_ip.tx_fifo ($paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo).
+Mapping positional arguments of cell polaris_uart_ip.tx0 (uart_tx).
+Mapping positional arguments of cell polaris_uart_ip.rx_fifo ($paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo).
+Mapping positional arguments of cell polaris_uart_ip.rx0 (uart_rx).
+Mapping positional arguments of cell openPolarisUART.formal ($paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal).
+Mapping positional arguments of cell openPolarisUART.uart0 (polaris_uart_ip).
+Mapping positional arguments of cell openPolarisUART.skidbuffer ($paramod\skdbf\DW=s32'00000000000000000000000000110011).
+
+8.3. Executing PROC pass (convert processes to netlists).
+
+8.3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+8.3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 1 dead cases from process $proc$uart_rx.sv:37$424 in module uart_rx.
+Marked 7 switch rules as full_case in process $proc$uart_rx.sv:37$424 in module uart_rx.
+Marked 6 switch rules as full_case in process $proc$uart_tx.sv:23$403 in module uart_tx.
+Marked 1 switch rules as full_case in process $proc$sfifo.sv:50$324 in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Marked 2 switch rules as full_case in process $proc$skdbf.sv:25$271 in module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Marked 2 switch rules as full_case in process $proc$tlul_slave_formal.sv:76$183 in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Marked 2 switch rules as full_case in process $proc$openPolarisUART.sv:85$21 in module openPolarisUART.
+Marked 1 switch rules as full_case in process $proc$openPolarisUART.sv:61$5 in module openPolarisUART.
+Removed a total of 1 dead cases.
+
+8.3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 3 redundant assignments.
+Promoted 114 assignments to connections.
+
+8.3.4. Executing PROC_INIT pass (extract init attributes).
+Found init rule in `\uart_rx.$proc$uart_rx.sv:0$463'.
+  Set init value: \y = 1'0
+Found init rule in `\uart_rx.$proc$uart_rx.sv:0$462'.
+  Set init value: \x = 1'0
+Found init rule in `\uart_rx.$proc$uart_rx.sv:0$461'.
+  Set init value: \index = 3'000
+Found init rule in `\uart_rx.$proc$uart_rx.sv:0$460'.
+  Set init value: \state = 2'00
+Found init rule in `\uart_tx.$proc$uart_tx.sv:0$417'.
+  Set init value: \state_machine_stage = 3'000
+Found init rule in `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+  Set init value: \underflow = 1'0
+  Set init value: \overflow = 1'0
+  Set init value: \read_ptr = 6'000000
+  Set init value: \write_ptr = 6'000000
+Found init rule in `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:0$274'.
+  Set init value: \held_data = 51'000000000000000000000000000000000000000000000000000
+Found init rule in `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:0$273'.
+  Set init value: \held_vld = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$258'.
+  Set init value: $formal$tlul_slave_formal.sv:71$84_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$256'.
+  Set init value: $formal$tlul_slave_formal.sv:70$83_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$254'.
+  Set init value: $formal$tlul_slave_formal.sv:69$82_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$252'.
+  Set init value: $formal$tlul_slave_formal.sv:68$81_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$250'.
+  Set init value: $formal$tlul_slave_formal.sv:67$80_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$248'.
+  Set init value: $formal$tlul_slave_formal.sv:66$79_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$246'.
+  Set init value: $formal$tlul_slave_formal.sv:65$78_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$244'.
+  Set init value: $formal$tlul_slave_formal.sv:64$77_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$242'.
+  Set init value: $formal$tlul_slave_formal.sv:58$76_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$240'.
+  Set init value: $formal$tlul_slave_formal.sv:57$75_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$238'.
+  Set init value: $formal$tlul_slave_formal.sv:56$74_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$236'.
+  Set init value: $formal$tlul_slave_formal.sv:55$73_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$234'.
+  Set init value: $formal$tlul_slave_formal.sv:54$72_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$232'.
+  Set init value: $formal$tlul_slave_formal.sv:53$71_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$230'.
+  Set init value: $formal$tlul_slave_formal.sv:52$70_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$228'.
+  Set init value: $formal$tlul_slave_formal.sv:51$69_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$226'.
+  Set init value: $formal$tlul_slave_formal.sv:50$68_EN = 1'0
+Found init rule in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$212'.
+  Set init value: \past_valid_f = 1'0
+Found init rule in `\openPolarisUART.$proc$openPolarisUART.sv:0$34'.
+  Set init value: \polarisUartCSR = 15'000000000000000
+
+8.3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+8.3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~31 debug messages>
+
+8.3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\uart_rx.$proc$uart_rx.sv:0$463'.
+Creating decoders for process `\uart_rx.$proc$uart_rx.sv:0$462'.
+Creating decoders for process `\uart_rx.$proc$uart_rx.sv:0$461'.
+Creating decoders for process `\uart_rx.$proc$uart_rx.sv:0$460'.
+Creating decoders for process `\uart_rx.$proc$uart_rx.sv:37$424'.
+     1/12: $2$lookahead\byte_recieved$423[7:0]$442
+     2/12: $2$bitselwrite$data$uart_rx.sv:68$419[7:0]$440
+     3/12: $2$bitselwrite$mask$uart_rx.sv:68$418[7:0]$439
+     4/12: $2$bitselwrite$sel$uart_rx.sv:68$420[2:0]$441
+     5/12: $0\state[1:0]
+     6/12: $1$lookahead\byte_recieved$423[7:0]$432
+     7/12: $1$bitselwrite$sel$uart_rx.sv:68$420[2:0]$431
+     8/12: $1$bitselwrite$data$uart_rx.sv:68$419[7:0]$430
+     9/12: $1$bitselwrite$mask$uart_rx.sv:68$418[7:0]$429
+    10/12: $0\o_sig_byte_recieved[0:0]
+    11/12: $0\index[2:0]
+    12/12: $0\counter[11:0]
+Creating decoders for process `\uart_rx.$proc$uart_rx.sv:32$422'.
+Creating decoders for process `\uart_tx.$proc$uart_tx.sv:0$417'.
+Creating decoders for process `\uart_tx.$proc$uart_tx.sv:23$403'.
+     1/5: $0\state_machine_stage[2:0]
+     2/5: $0\bit_index[2:0]
+     3/5: $0\counter[11:0]
+     4/5: $0\o_uart_tx[0:0]
+     5/5: $0\tx_byte[7:0]
+Creating decoders for process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+Creating decoders for process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+     1/3: $1$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$334
+     2/3: $1$memwr$\fifo$sfifo.sv:52$307_DATA[7:0]$333
+     3/3: $1$memwr$\fifo$sfifo.sv:52$307_ADDR[4:0]$332
+Creating decoders for process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:37$313'.
+     1/2: $0\write_ptr[5:0]
+     2/2: $0\read_ptr[5:0]
+Creating decoders for process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:0$274'.
+Creating decoders for process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:0$273'.
+Creating decoders for process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:25$271'.
+     1/2: $0\held_vld[0:0]
+     2/2: $0\held_data[50:0]
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$258'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$256'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$254'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$252'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$250'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$248'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$246'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$244'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$242'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$240'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$238'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$236'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$234'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$232'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$230'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$228'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$226'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$212'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:76$183'.
+     1/1: $0\total_transactions[4:0]
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+     1/16: $0$formal$tlul_slave_formal.sv:64$77_EN[0:0]$155
+     2/16: $0$formal$tlul_slave_formal.sv:64$77_CHECK[0:0]$154
+     3/16: $0$formal$tlul_slave_formal.sv:65$78_EN[0:0]$157
+     4/16: $0$formal$tlul_slave_formal.sv:65$78_CHECK[0:0]$156
+     5/16: $0$formal$tlul_slave_formal.sv:66$79_EN[0:0]$159
+     6/16: $0$formal$tlul_slave_formal.sv:66$79_CHECK[0:0]$158
+     7/16: $0$formal$tlul_slave_formal.sv:67$80_EN[0:0]$161
+     8/16: $0$formal$tlul_slave_formal.sv:67$80_CHECK[0:0]$160
+     9/16: $0$formal$tlul_slave_formal.sv:68$81_EN[0:0]$163
+    10/16: $0$formal$tlul_slave_formal.sv:68$81_CHECK[0:0]$162
+    11/16: $0$formal$tlul_slave_formal.sv:69$82_EN[0:0]$165
+    12/16: $0$formal$tlul_slave_formal.sv:69$82_CHECK[0:0]$164
+    13/16: $0$formal$tlul_slave_formal.sv:70$83_EN[0:0]$167
+    14/16: $0$formal$tlul_slave_formal.sv:70$83_CHECK[0:0]$166
+    15/16: $0$formal$tlul_slave_formal.sv:71$84_EN[0:0]$169
+    16/16: $0$formal$tlul_slave_formal.sv:71$84_CHECK[0:0]$168
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+     1/18: $0$formal$tlul_slave_formal.sv:50$68_EN[0:0]$111
+     2/18: $0$formal$tlul_slave_formal.sv:50$68_CHECK[0:0]$110
+     3/18: $0$formal$tlul_slave_formal.sv:51$69_EN[0:0]$113
+     4/18: $0$formal$tlul_slave_formal.sv:51$69_CHECK[0:0]$112
+     5/18: $0$formal$tlul_slave_formal.sv:52$70_EN[0:0]$115
+     6/18: $0$formal$tlul_slave_formal.sv:52$70_CHECK[0:0]$114
+     7/18: $0$formal$tlul_slave_formal.sv:53$71_EN[0:0]$117
+     8/18: $0$formal$tlul_slave_formal.sv:53$71_CHECK[0:0]$116
+     9/18: $0$formal$tlul_slave_formal.sv:54$72_EN[0:0]$119
+    10/18: $0$formal$tlul_slave_formal.sv:54$72_CHECK[0:0]$118
+    11/18: $0$formal$tlul_slave_formal.sv:55$73_EN[0:0]$121
+    12/18: $0$formal$tlul_slave_formal.sv:55$73_CHECK[0:0]$120
+    13/18: $0$formal$tlul_slave_formal.sv:56$74_EN[0:0]$123
+    14/18: $0$formal$tlul_slave_formal.sv:56$74_CHECK[0:0]$122
+    15/18: $0$formal$tlul_slave_formal.sv:57$75_EN[0:0]$125
+    16/18: $0$formal$tlul_slave_formal.sv:57$75_CHECK[0:0]$124
+    17/18: $0$formal$tlul_slave_formal.sv:58$76_EN[0:0]$127
+    18/18: $0$formal$tlul_slave_formal.sv:58$76_CHECK[0:0]$126
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$86'.
+Creating decoders for process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:39$85'.
+Creating decoders for process `\openPolarisUART.$proc$openPolarisUART.sv:0$34'.
+Creating decoders for process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+     1/8: $0\uart_d_valid[0:0]
+     2/8: $0\uart_d_corrupt[0:0]
+     3/8: $0\uart_d_data[31:0]
+     4/8: $0\uart_d_denied[0:0]
+     5/8: $0\uart_d_source[3:0]
+     6/8: $0\uart_d_size[3:0]
+     7/8: $0\uart_d_param[1:0]
+     8/8: $0\uart_d_opcode[2:0]
+Creating decoders for process `\openPolarisUART.$proc$openPolarisUART.sv:0$10'.
+Creating decoders for process `\openPolarisUART.$proc$openPolarisUART.sv:61$5'.
+     1/1: $0\polarisUartCSR[14:0]
+
+8.3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$fordecl_block$1.i' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$275_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$276_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$277_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$278_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$279_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$280_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$281_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$282_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$283_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$284_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$285_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$286_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$287_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$288_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$289_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$290_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$291_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$292_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$293_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$294_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$295_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$296_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$297_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$298_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$299_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$300_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$301_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$302_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$303_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$304_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$305_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:26$306_EN' from process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:33$58_CHECK' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:33$58_EN' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:34$60_CHECK' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:34$60_EN' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:35$62_CHECK' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:35$62_EN' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:36$64_CHECK' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:36$64_EN' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:43$66_CHECK' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$86'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:43$66_EN' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$86'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:44$67_CHECK' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$86'.
+No latch inferred for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:44$67_EN' from process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$86'.
+No latch inferred for signal `\openPolarisUART.\read_fifo' from process `\openPolarisUART.$proc$openPolarisUART.sv:0$10'.
+No latch inferred for signal `\openPolarisUART.\write_fifo' from process `\openPolarisUART.$proc$openPolarisUART.sv:0$10'.
+No latch inferred for signal `\openPolarisUART.\write_data' from process `\openPolarisUART.$proc$openPolarisUART.sv:0$10'.
+
+8.3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\uart_rx.\counter' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$807' with positive edge clock.
+Creating register for signal `\uart_rx.\state' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$808' with positive edge clock.
+Creating register for signal `\uart_rx.\byte_recieved' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$809' with positive edge clock.
+Creating register for signal `\uart_rx.\index' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$810' with positive edge clock.
+Creating register for signal `\uart_rx.\o_sig_byte_recieved' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$811' with positive edge clock.
+Creating register for signal `\uart_rx.$bitselwrite$mask$uart_rx.sv:68$418' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$812' with positive edge clock.
+Creating register for signal `\uart_rx.$bitselwrite$data$uart_rx.sv:68$419' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$813' with positive edge clock.
+Creating register for signal `\uart_rx.$bitselwrite$sel$uart_rx.sv:68$420' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$814' with positive edge clock.
+Creating register for signal `\uart_rx.$lookahead\byte_recieved$423' using process `\uart_rx.$proc$uart_rx.sv:37$424'.
+  created $dff cell `$procdff$815' with positive edge clock.
+Creating register for signal `\uart_rx.\x' using process `\uart_rx.$proc$uart_rx.sv:32$422'.
+  created $dff cell `$procdff$816' with positive edge clock.
+Creating register for signal `\uart_rx.\y' using process `\uart_rx.$proc$uart_rx.sv:32$422'.
+  created $dff cell `$procdff$817' with positive edge clock.
+Creating register for signal `\uart_tx.\tx_byte' using process `\uart_tx.$proc$uart_tx.sv:23$403'.
+  created $dff cell `$procdff$818' with positive edge clock.
+Creating register for signal `\uart_tx.\o_uart_tx' using process `\uart_tx.$proc$uart_tx.sv:23$403'.
+  created $dff cell `$procdff$819' with positive edge clock.
+Creating register for signal `\uart_tx.\state_machine_stage' using process `\uart_tx.$proc$uart_tx.sv:23$403'.
+  created $dff cell `$procdff$820' with positive edge clock.
+Creating register for signal `\uart_tx.\counter' using process `\uart_tx.$proc$uart_tx.sv:23$403'.
+  created $dff cell `$procdff$821' with positive edge clock.
+Creating register for signal `\uart_tx.\bit_index' using process `\uart_tx.$proc$uart_tx.sv:23$403'.
+  created $dff cell `$procdff$822' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.\underflow' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+  created $dff cell `$procdff$823' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.\overflow' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+  created $dff cell `$procdff$824' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:52$307_ADDR' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+  created $dff cell `$procdff$825' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:52$307_DATA' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+  created $dff cell `$procdff$826' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$memwr$\fifo$sfifo.sv:52$307_EN' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+  created $dff cell `$procdff$827' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.\read_ptr' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:37$313'.
+  created $dff cell `$procdff$828' with positive edge clock.
+Creating register for signal `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.\write_ptr' using process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:37$313'.
+  created $dff cell `$procdff$829' with positive edge clock.
+Creating register for signal `$paramod\skdbf\DW=s32'00000000000000000000000000110011.\held_data' using process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:25$271'.
+  created $dff cell `$procdff$830' with positive edge clock.
+Creating register for signal `$paramod\skdbf\DW=s32'00000000000000000000000000110011.\held_vld' using process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:25$271'.
+  created $dff cell `$procdff$831' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.\total_transactions' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:76$183'.
+  created $dff cell `$procdff$832' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:64$47$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$833' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:64$48$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$834' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:64$49$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$835' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:65$50$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$836' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:66$51$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$837' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:67$52$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$838' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:68$53$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$839' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:69$54$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$840' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:70$55$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$841' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:71$56$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$842' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:72$57$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$843' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:64$77_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$844' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:64$77_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$845' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:65$78_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$846' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:65$78_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$847' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:66$79_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$848' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:66$79_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$849' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:67$80_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$850' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:67$80_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$851' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:68$81_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$852' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:68$81_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$853' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:69$82_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$854' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:69$82_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$855' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:70$83_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$856' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:70$83_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$857' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:71$84_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$858' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:71$84_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+  created $dff cell `$procdff$859' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:50$35$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$860' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:50$36$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$861' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:50$37$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$862' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:51$38$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$863' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:52$39$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$864' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:53$40$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$865' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:54$41$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$866' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:55$42$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$867' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:56$43$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$868' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:57$44$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$869' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:58$45$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$870' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$past$tlul_slave_formal.sv:59$46$0' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$871' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:50$68_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$872' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:50$68_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$873' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:51$69_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$874' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:51$69_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$875' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:52$70_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$876' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:52$70_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$877' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:53$71_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$878' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:53$71_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$879' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:54$72_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$880' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:54$72_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$881' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:55$73_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$882' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:55$73_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$883' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:56$74_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$884' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:56$74_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$885' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:57$75_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$886' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:57$75_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$887' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:58$76_CHECK' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$888' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$formal$tlul_slave_formal.sv:58$76_EN' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+  created $dff cell `$procdff$889' with positive edge clock.
+Creating register for signal `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.\past_valid_f' using process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:39$85'.
+  created $dff cell `$procdff$890' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_opcode' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$891' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_param' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$892' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_size' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$893' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_source' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$894' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_denied' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$895' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_data' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$896' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_corrupt' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$897' with positive edge clock.
+Creating register for signal `\openPolarisUART.\uart_d_valid' using process `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+  created $dff cell `$procdff$898' with positive edge clock.
+Creating register for signal `\openPolarisUART.\polarisUartCSR' using process `\openPolarisUART.$proc$openPolarisUART.sv:61$5'.
+  created $dff cell `$procdff$899' with positive edge clock.
+
+8.3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+8.3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `uart_rx.$proc$uart_rx.sv:0$463'.
+Removing empty process `uart_rx.$proc$uart_rx.sv:0$462'.
+Removing empty process `uart_rx.$proc$uart_rx.sv:0$461'.
+Removing empty process `uart_rx.$proc$uart_rx.sv:0$460'.
+Found and cleaned up 7 empty switches in `\uart_rx.$proc$uart_rx.sv:37$424'.
+Removing empty process `uart_rx.$proc$uart_rx.sv:37$424'.
+Removing empty process `uart_rx.$proc$uart_rx.sv:32$422'.
+Removing empty process `uart_tx.$proc$uart_tx.sv:0$417'.
+Found and cleaned up 6 empty switches in `\uart_tx.$proc$uart_tx.sv:23$403'.
+Removing empty process `uart_tx.$proc$uart_tx.sv:23$403'.
+Removing empty process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:0$369'.
+Found and cleaned up 1 empty switch in `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+Removing empty process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:50$324'.
+Found and cleaned up 3 empty switches in `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:37$313'.
+Removing empty process `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$proc$sfifo.sv:37$313'.
+Removing empty process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:0$274'.
+Removing empty process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:0$273'.
+Found and cleaned up 3 empty switches in `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:25$271'.
+Removing empty process `$paramod\skdbf\DW=s32'00000000000000000000000000110011.$proc$skdbf.sv:25$271'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$258'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$256'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$254'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$252'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$250'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$248'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$246'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$244'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$242'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$240'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$238'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$236'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$234'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$232'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$230'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$228'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$226'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$213'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$212'.
+Found and cleaned up 2 empty switches in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:76$183'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:76$183'.
+Found and cleaned up 1 empty switch in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:63$142'.
+Found and cleaned up 1 empty switch in `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:49$97'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:0$86'.
+Removing empty process `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$proc$tlul_slave_formal.sv:39$85'.
+Removing empty process `openPolarisUART.$proc$openPolarisUART.sv:0$34'.
+Found and cleaned up 4 empty switches in `\openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+Removing empty process `openPolarisUART.$proc$openPolarisUART.sv:85$21'.
+Removing empty process `openPolarisUART.$proc$openPolarisUART.sv:0$10'.
+Found and cleaned up 3 empty switches in `\openPolarisUART.$proc$openPolarisUART.sv:61$5'.
+Removing empty process `openPolarisUART.$proc$openPolarisUART.sv:61$5'.
+Cleaned up 31 empty switches.
+
+8.3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module uart_rx.
+<suppressed ~12 debug messages>
+Optimizing module uart_tx.
+<suppressed ~5 debug messages>
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+<suppressed ~1 debug messages>
+Optimizing module polaris_uart_ip.
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+<suppressed ~7 debug messages>
+Optimizing module openPolarisUART.
+<suppressed ~7 debug messages>
+
+8.4. Executing FUTURE pass.
+
+8.5. Executing OPT_EXPR pass (perform const folding).
+Optimizing module uart_rx.
+Optimizing module uart_tx.
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Optimizing module polaris_uart_ip.
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Optimizing module openPolarisUART.
+
+8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \uart_rx..
+Finding unused cells or wires in module \uart_tx..
+Finding unused cells or wires in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+Finding unused cells or wires in module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+Finding unused cells or wires in module \polaris_uart_ip..
+Finding unused cells or wires in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+Finding unused cells or wires in module \openPolarisUART..
+Removed 35 unused cells and 372 unused wires.
+<suppressed ~42 debug messages>
+
+8.7. Executing CHECK pass (checking for obvious problems).
+Checking module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal...
+Checking module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo...
+Checking module $paramod\skdbf\DW=s32'00000000000000000000000000110011...
+Checking module openPolarisUART...
+Checking module polaris_uart_ip...
+Checking module uart_rx...
+Checking module uart_tx...
+Found and reported 0 problems.
+
+8.8. Executing OPT pass (performing simple optimizations).
+
+8.8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Optimizing module openPolarisUART.
+Optimizing module polaris_uart_ip.
+Optimizing module uart_rx.
+Optimizing module uart_tx.
+
+8.8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal'.
+<suppressed ~12 debug messages>
+Finding identical cells in module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+<suppressed ~15 debug messages>
+Finding identical cells in module `$paramod\skdbf\DW=s32'00000000000000000000000000110011'.
+Finding identical cells in module `\openPolarisUART'.
+<suppressed ~39 debug messages>
+Finding identical cells in module `\polaris_uart_ip'.
+Finding identical cells in module `\uart_rx'.
+<suppressed ~54 debug messages>
+Finding identical cells in module `\uart_tx'.
+<suppressed ~51 debug messages>
+Removed a total of 57 cells.
+
+8.8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \openPolarisUART..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \polaris_uart_ip..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \uart_rx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$468.
+Running muxtree optimizer on module \uart_tx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 1 multiplexer ports.
+<suppressed ~63 debug messages>
+
+8.8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+    New ctrl vector for $pmux cell $procmux$663: { $procmux$666_CMP $procmux$665_CMP $auto$opt_reduce.cc:134:opt_pmux$902 }
+  Optimizing cells in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+  Optimizing cells in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+    Consolidated identical input bits for $mux cell $procmux$632:
+      Old ports: A=8'00000000, B=8'11111111, Y=$0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327
+      New ports: A=1'0, B=1'1, Y=$0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0]
+      New connections: $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [7:1] = { $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] $0$memwr$\fifo$sfifo.sv:52$307_EN[7:0]$327 [0] }
+  Optimizing cells in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+  Optimizing cells in module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+  Optimizing cells in module \openPolarisUART.
+  Optimizing cells in module \polaris_uart_ip.
+  Optimizing cells in module \uart_rx.
+    New ctrl vector for $pmux cell $procmux$511: { $procmux$510_CMP $procmux$469_CMP $auto$opt_reduce.cc:134:opt_pmux$904 }
+  Optimizing cells in module \uart_rx.
+  Optimizing cells in module \uart_tx.
+    New ctrl vector for $pmux cell $procmux$617: { $procmux$582_CMP $procmux$578_CMP $auto$opt_reduce.cc:134:opt_pmux$906 }
+  Optimizing cells in module \uart_tx.
+Performed a total of 4 changes.
+
+8.8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal'.
+<suppressed ~90 debug messages>
+Finding identical cells in module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+Finding identical cells in module `$paramod\skdbf\DW=s32'00000000000000000000000000110011'.
+Finding identical cells in module `\openPolarisUART'.
+Finding identical cells in module `\polaris_uart_ip'.
+Finding identical cells in module `\uart_rx'.
+Finding identical cells in module `\uart_tx'.
+<suppressed ~6 debug messages>
+Removed a total of 32 cells.
+
+8.8.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+Finding unused cells or wires in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+Finding unused cells or wires in module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+Finding unused cells or wires in module \openPolarisUART..
+Finding unused cells or wires in module \polaris_uart_ip..
+Finding unused cells or wires in module \uart_rx..
+Finding unused cells or wires in module \uart_tx..
+Removed 0 unused cells and 90 unused wires.
+<suppressed ~5 debug messages>
+
+8.8.7. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Optimizing module openPolarisUART.
+Optimizing module polaris_uart_ip.
+Optimizing module uart_rx.
+Optimizing module uart_tx.
+
+8.8.8. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.8.9. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \openPolarisUART..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \polaris_uart_ip..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \uart_rx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \uart_tx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~48 debug messages>
+
+8.8.10. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+  Optimizing cells in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+  Optimizing cells in module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+  Optimizing cells in module \openPolarisUART.
+  Optimizing cells in module \polaris_uart_ip.
+  Optimizing cells in module \uart_rx.
+  Optimizing cells in module \uart_tx.
+    New ctrl vector for $pmux cell $procmux$605: { $procmux$586_CMP $auto$opt_reduce.cc:134:opt_pmux$908 }
+  Optimizing cells in module \uart_tx.
+Performed a total of 1 changes.
+
+8.8.11. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal'.
+Finding identical cells in module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+Finding identical cells in module `$paramod\skdbf\DW=s32'00000000000000000000000000110011'.
+Finding identical cells in module `\openPolarisUART'.
+Finding identical cells in module `\polaris_uart_ip'.
+Finding identical cells in module `\uart_rx'.
+Finding identical cells in module `\uart_tx'.
+Removed a total of 0 cells.
+
+8.8.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+Finding unused cells or wires in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+Finding unused cells or wires in module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+Finding unused cells or wires in module \openPolarisUART..
+Finding unused cells or wires in module \polaris_uart_ip..
+Finding unused cells or wires in module \uart_rx..
+Finding unused cells or wires in module \uart_tx..
+
+8.8.13. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Optimizing module openPolarisUART.
+Optimizing module polaris_uart_ip.
+Optimizing module uart_rx.
+Optimizing module uart_tx.
+
+8.8.14. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.8.15. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \openPolarisUART..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \polaris_uart_ip..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \uart_rx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \uart_tx..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~48 debug messages>
+
+8.8.16. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+  Optimizing cells in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+  Optimizing cells in module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+  Optimizing cells in module \openPolarisUART.
+  Optimizing cells in module \polaris_uart_ip.
+  Optimizing cells in module \uart_rx.
+  Optimizing cells in module \uart_tx.
+Performed a total of 0 changes.
+
+8.8.17. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal'.
+Finding identical cells in module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+Finding identical cells in module `$paramod\skdbf\DW=s32'00000000000000000000000000110011'.
+Finding identical cells in module `\openPolarisUART'.
+Finding identical cells in module `\polaris_uart_ip'.
+Finding identical cells in module `\uart_rx'.
+Finding identical cells in module `\uart_tx'.
+Removed a total of 0 cells.
+
+8.8.18. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+Finding unused cells or wires in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+Finding unused cells or wires in module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+Finding unused cells or wires in module \openPolarisUART..
+Finding unused cells or wires in module \polaris_uart_ip..
+Finding unused cells or wires in module \uart_rx..
+Finding unused cells or wires in module \uart_tx..
+
+8.8.19. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Optimizing module openPolarisUART.
+Optimizing module polaris_uart_ip.
+Optimizing module uart_rx.
+Optimizing module uart_tx.
+
+8.8.20. Finished OPT passes. (There is nothing left to do.)
+
+8.9. Executing WREDUCE pass (reducing word size of cells).
+Removed top 2 bits (of 4) from port B of cell $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$le$tlul_slave_formal.sv:44$91 ($le).
+Removed top 2 bits (of 3) from port B of cell $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$eq$tlul_slave_formal.sv:45$93 ($eq).
+Removed top 1 bits (of 2) from port B of cell $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.$procmux$666_CMP0 ($eq).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$337 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$338 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$339 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$340 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$341 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$342 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$343 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$344 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$345 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$346 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$347 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$348 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$349 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$350 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$351 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$352 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$353 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$354 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$355 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$356 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$357 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$358 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$359 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$360 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$361 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$362 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$363 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$364 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$365 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$366 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$367 (fifo).
+Removed top 27 address bits (of 32) from memory init port $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$meminit$\fifo$sfifo.sv:26$368 (fifo).
+Removed top 31 bits (of 32) from port B of cell $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$add$sfifo.sv:43$318 ($add).
+Removed top 26 bits (of 32) from port Y of cell $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$add$sfifo.sv:43$318 ($add).
+Removed top 31 bits (of 32) from port B of cell $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$add$sfifo.sv:46$323 ($add).
+Removed top 26 bits (of 32) from port Y of cell $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$add$sfifo.sv:46$323 ($add).
+Removed top 26 bits (of 32) from wire $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.$add$sfifo.sv:43$318_Y.
+Removed top 1 bits (of 2) from port B of cell openPolarisUART.$eq$openPolarisUART.sv:81$19 ($eq).
+Removed top 2 bits (of 3) from mux cell openPolarisUART.$ternary$openPolarisUART.sv:94$24 ($mux).
+Removed top 2 bits (of 3) from wire openPolarisUART.$ternary$openPolarisUART.sv:94$24_Y.
+Removed top 31 bits (of 32) from port B of cell uart_rx.$sub$uart_rx.sv:28$421 ($sub).
+Removed top 19 bits (of 32) from port Y of cell uart_rx.$sub$uart_rx.sv:28$421 ($sub).
+Removed top 1 bits (of 12) from port B of cell uart_rx.$eq$uart_rx.sv:52$434 ($eq).
+Removed top 31 bits (of 32) from port B of cell uart_rx.$add$uart_rx.sv:62$436 ($add).
+Removed top 20 bits (of 32) from port Y of cell uart_rx.$add$uart_rx.sv:62$436 ($add).
+Removed top 28 bits (of 32) from port A of cell uart_rx.$sub$uart_rx.sv:0$443 ($sub).
+Removed top 31 bits (of 32) from port B of cell uart_rx.$sub$uart_rx.sv:0$443 ($sub).
+Converting cell uart_rx.$sub$uart_rx.sv:0$443 ($sub) from signed to unsigned.
+Removed top 27 bits (of 32) from port Y of cell uart_rx.$sub$uart_rx.sv:0$443 ($sub).
+Removed top 1 bits (of 4) from port A of cell uart_rx.$sub$uart_rx.sv:0$443 ($sub).
+Removed top 1 bits (of 5) from port Y of cell uart_rx.$sub$uart_rx.sv:0$443 ($sub).
+Removed top 28 bits (of 32) from port A of cell uart_rx.$neg$uart_rx.sv:0$444 ($neg).
+Removed top 29 bits (of 32) from port B of cell uart_rx.$lt$uart_rx.sv:69$453 ($lt).
+Removed top 31 bits (of 32) from port B of cell uart_rx.$add$uart_rx.sv:70$454 ($add).
+Removed top 29 bits (of 32) from port Y of cell uart_rx.$add$uart_rx.sv:70$454 ($add).
+Removed top 1 bits (of 12) from port A of cell uart_rx.$add$uart_rx.sv:85$456 ($add).
+Removed top 19 bits (of 32) from port Y of cell uart_rx.$add$uart_rx.sv:85$456 ($add).
+Removed top 19 bits (of 32) from port A of cell uart_rx.$sub$uart_rx.sv:85$457 ($sub).
+Removed top 31 bits (of 32) from port B of cell uart_rx.$sub$uart_rx.sv:85$457 ($sub).
+Removed top 18 bits (of 32) from port Y of cell uart_rx.$sub$uart_rx.sv:85$457 ($sub).
+Removed top 1 bits (of 2) from mux cell uart_rx.$procmux$495 ($mux).
+Removed top 1 bits (of 2) from mux cell uart_rx.$procmux$497 ($mux).
+Removed top 1 bits (of 2) from port B of cell uart_rx.$procmux$506_CMP0 ($eq).
+Removed top 1 bits (of 2) from mux cell uart_rx.$procmux$508 ($mux).
+Removed top 20 bits (of 32) from wire uart_rx.$add$uart_rx.sv:62$436_Y.
+Removed top 29 bits (of 32) from wire uart_rx.$add$uart_rx.sv:70$454_Y.
+Removed top 1 bits (of 12) from wire uart_rx.half_of_rate.
+Removed top 1 bits (of 12) from wire uart_rx.sample_point.
+Removed top 11 bits (of 12) from wire uart_rx.sample_point_0.
+Removed top 31 bits (of 32) from port B of cell uart_tx.$sub$uart_tx.sv:38$404 ($sub).
+Removed top 19 bits (of 32) from port Y of cell uart_tx.$sub$uart_tx.sv:38$404 ($sub).
+Removed top 31 bits (of 32) from port B of cell uart_tx.$add$uart_tx.sv:39$406 ($add).
+Removed top 20 bits (of 32) from port Y of cell uart_tx.$add$uart_tx.sv:39$406 ($add).
+Removed top 31 bits (of 32) from port B of cell uart_tx.$add$uart_tx.sv:61$412 ($add).
+Removed top 29 bits (of 32) from port Y of cell uart_tx.$add$uart_tx.sv:61$412 ($add).
+Removed top 1 bits (of 3) from mux cell uart_tx.$procmux$568 ($mux).
+Removed top 1 bits (of 3) from port B of cell uart_tx.$procmux$571_CMP0 ($eq).
+Removed top 2 bits (of 3) from mux cell uart_tx.$procmux$573 ($mux).
+Removed top 2 bits (of 3) from mux cell uart_tx.$procmux$576 ($mux).
+Removed top 1 bits (of 3) from port B of cell uart_tx.$procmux$578_CMP0 ($eq).
+Removed top 1 bits (of 3) from mux cell uart_tx.$procmux$580 ($mux).
+Removed top 2 bits (of 3) from port B of cell uart_tx.$procmux$582_CMP0 ($eq).
+Removed top 2 bits (of 3) from mux cell uart_tx.$procmux$584 ($mux).
+Removed top 20 bits (of 32) from wire uart_tx.$add$uart_tx.sv:39$406_Y.
+
+8.10. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+Finding unused cells or wires in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+Finding unused cells or wires in module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+Finding unused cells or wires in module \openPolarisUART..
+Finding unused cells or wires in module \polaris_uart_ip..
+Finding unused cells or wires in module \uart_rx..
+Finding unused cells or wires in module \uart_tx..
+Removed 0 unused cells and 8 unused wires.
+<suppressed ~4 debug messages>
+
+8.11. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+8.12. Executing OPT pass (performing simple optimizations).
+
+8.12.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal.
+Optimizing module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo.
+Optimizing module $paramod\skdbf\DW=s32'00000000000000000000000000110011.
+Optimizing module openPolarisUART.
+Optimizing module polaris_uart_ip.
+Optimizing module uart_rx.
+Optimizing module uart_tx.
+
+8.12.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal'.
+Finding identical cells in module `$paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo'.
+Finding identical cells in module `$paramod\skdbf\DW=s32'00000000000000000000000000110011'.
+Finding identical cells in module `\openPolarisUART'.
+Finding identical cells in module `\polaris_uart_ip'.
+Finding identical cells in module `\uart_rx'.
+Finding identical cells in module `\uart_tx'.
+Removed a total of 0 cells.
+
+8.12.3. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal..
+Finding unused cells or wires in module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo..
+Finding unused cells or wires in module $paramod\skdbf\DW=s32'00000000000000000000000000110011..
+Finding unused cells or wires in module \openPolarisUART..
+Finding unused cells or wires in module \polaris_uart_ip..
+Finding unused cells or wires in module \uart_rx..
+Finding unused cells or wires in module \uart_tx..
+
+8.12.4. Finished fast OPT passes.
+
+8.13. Printing statistics.
+
+=== $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal ===
+
+   Number of wires:                133
+   Number of wire bits:            331
+   Number of public wires:          24
+   Number of public wire bits:     119
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                134
+     $add                            1
+     $and                            8
+     $assert                         8
+     $assume                        15
+     $dff                           44
+     $eq                            22
+     $initstate                      1
+     $le                             1
+     $logic_not                      6
+     $logic_or                       2
+     $mux                           20
+     $not                            3
+     $pmux                           1
+     $reduce_or                      1
+     $sub                            1
+
+=== $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo ===
+
+   Number of wires:                 32
+   Number of wire bits:            130
+   Number of public wires:          12
+   Number of public wire bits:      36
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 27
+     $add                            2
+     $and                            7
+     $dff                            4
+     $eq                             2
+     $mem_v2                         1
+     $mux                            7
+     $ne                             1
+     $not                            3
+
+=== $paramod\skdbf\DW=s32'00000000000000000000000000110011 ===
+
+   Number of wires:                 19
+   Number of wire bits:            269
+   Number of public wires:          11
+   Number of public wire bits:     161
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 13
+     $and                            3
+     $dff                            2
+     $logic_not                      1
+     $mux                            7
+
+=== openPolarisUART ===
+
+   Number of wires:                 86
+   Number of wire bits:            407
+   Number of public wires:          43
+   Number of public wire bits:     207
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 59
+     $and                            5
+     $dff                            9
+     $eq                             3
+     $logic_and                      5
+     $logic_not                      5
+     $mux                           21
+     $ne                             1
+     $not                            2
+     $or                             1
+     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal      1
+     $paramod\skdbf\DW=s32'00000000000000000000000000110011      1
+     $pmux                           3
+     $reduce_bool                    1
+     polaris_uart_ip                 1
+
+=== polaris_uart_ip ===
+
+   Number of wires:                 28
+   Number of wire bits:             67
+   Number of public wires:          25
+   Number of public wire bits:      64
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                  9
+     $and                            3
+     $logic_not                      2
+     $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo      2
+     uart_rx                         1
+     uart_tx                         1
+
+=== uart_rx ===
+
+   Number of wires:                 55
+   Number of wire bits:            399
+   Number of public wires:          15
+   Number of public wire bits:      74
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 47
+     $add                            3
+     $and                            1
+     $dff                            7
+     $eq                             6
+     $logic_not                      1
+     $lt                             1
+     $mux                           14
+     $neg                            1
+     $not                            1
+     $or                             1
+     $pmux                           5
+     $reduce_or                      1
+     $shift                          2
+     $sub                            3
+
+=== uart_tx ===
+
+   Number of wires:                 37
+   Number of wire bits:            206
+   Number of public wires:          10
+   Number of public wire bits:      50
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                 33
+     $add                            2
+     $dff                            5
+     $eq                             4
+     $logic_not                      1
+     $lt                             1
+     $mux                           11
+     $pmux                           4
+     $reduce_bool                    1
+     $reduce_or                      2
+     $shiftx                         1
+     $sub                            1
+
+=== design hierarchy ===
+
+   openPolarisUART                   1
+     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal      1
+     $paramod\skdbf\DW=s32'00000000000000000000000000110011      1
+     polaris_uart_ip                 1
+       $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo      2
+       uart_rx                       1
+       uart_tx                       1
+
+   Number of wires:                422
+   Number of wire bits:           1939
+   Number of public wires:         152
+   Number of public wire bits:     747
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                342
+     $add                           10
+     $and                           34
+     $assert                         8
+     $assume                        15
+     $dff                           75
+     $eq                            39
+     $initstate                      1
+     $le                             1
+     $logic_and                      5
+     $logic_not                     16
+     $logic_or                       2
+     $lt                             2
+     $mem_v2                         2
+     $mux                           87
+     $ne                             3
+     $neg                            1
+     $not                           12
+     $or                             2
+     $pmux                          13
+     $reduce_bool                    2
+     $reduce_or                      4
+     $shift                          2
+     $shiftx                         1
+     $sub                            5
+
+8.14. Executing CHECK pass (checking for obvious problems).
+Checking module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal...
+Checking module $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo...
+Checking module $paramod\skdbf\DW=s32'00000000000000000000000000110011...
+Checking module openPolarisUART...
+Checking module polaris_uart_ip...
+Checking module uart_rx...
+Checking module uart_tx...
+Found and reported 0 problems.
+
+9. Executing HIERARCHY pass (managing design hierarchy).
+
+9.1. Analyzing design hierarchy..
+Top module:  \openPolarisUART
+Used module:     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal
+Used module:     $paramod\skdbf\DW=s32'00000000000000000000000000110011
+Used module:     \polaris_uart_ip
+Used module:         \uart_rx
+Used module:         $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo
+Used module:         \uart_tx
+
+9.2. Analyzing design hierarchy..
+Top module:  \openPolarisUART
+Used module:     $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal
+Used module:     $paramod\skdbf\DW=s32'00000000000000000000000000110011
+Used module:     \polaris_uart_ip
+Used module:         \uart_rx
+Used module:         $paramod$9a532d3a74189bb4cf9820f3f80245c16da3e5be\sfifo
+Used module:         \uart_tx
+Removed 0 unused modules.
+Module $paramod$2b3a633f7bbc2a92129dd0bd4a738074dca1a491\tlul_slave_formal directly or indirectly contains formal properties -> setting "keep" attribute.
+Module openPolarisUART directly or indirectly contains formal properties -> setting "keep" attribute.
+
+10. Executing jny backend.
+
+11. Executing RTLIL backend.
+Output filename: ../model/design.il
+
+End of script. Logfile hash: 5bd171200e, CPU: user 0.10s system 0.00s, MEM: 14.60 MB peak
+Yosys 0.34+43 (git sha1 d21c464ae, clang 10.0.0-4ubuntu1 -fPIC -Os)
+Time spent: 19% 6x opt_clean (0 sec), 18% 7x opt_expr (0 sec), ...

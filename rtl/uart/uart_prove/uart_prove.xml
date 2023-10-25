@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+<testsuite timestamp="2023-10-25T23:45:28" hostname="DESKTOP-6QDPAO4" package="uart_prove" id="0" name="default" tests="8" errors="0" failures="0" time="0" skipped="0">
+<properties>
+<property name="os" value="Linux"/>
+<property name="expect" value="PASS"/>
+<property name="status" value="PASS"/>
+</properties>
+<testcase classname="default" name="build execution" time="0">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:64.97-65.42" time="0" type="ASSERT" location="tlul_slave_formal.sv:64.97-65.42" id="$assert$tlul_slave_formal.sv:64$204">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:65.43-66.45" time="0" type="ASSERT" location="tlul_slave_formal.sv:65.43-66.45" id="$assert$tlul_slave_formal.sv:65$205">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:66.46-67.44" time="0" type="ASSERT" location="tlul_slave_formal.sv:66.46-67.44" id="$assert$tlul_slave_formal.sv:66$206">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:67.45-68.43" time="0" type="ASSERT" location="tlul_slave_formal.sv:67.45-68.43" id="$assert$tlul_slave_formal.sv:67$207">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:68.44-69.42" time="0" type="ASSERT" location="tlul_slave_formal.sv:68.44-69.42" id="$assert$tlul_slave_formal.sv:68$208">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:69.43-70.44" time="0" type="ASSERT" location="tlul_slave_formal.sv:69.43-70.44" id="$assert$tlul_slave_formal.sv:69$209">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:70.45-71.44" time="0" type="ASSERT" location="tlul_slave_formal.sv:70.45-71.44" id="$assert$tlul_slave_formal.sv:70$210">
+</testcase>
+<testcase classname="default" name="Property ASSERT in openPolarisUART/formal at tlul_slave_formal.sv:71.45-72.43" time="0" type="ASSERT" location="tlul_slave_formal.sv:71.45-72.43" id="$assert$tlul_slave_formal.sv:71$211">
+</testcase>
+<system-out>SBY 23:45:27 [uart_prove] Removing directory '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/skdbf.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/skdbf.sv'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/openPolarisUART.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/openPolarisUART.sv'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_rx.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/uart_rx.sv'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_tx.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/uart_tx.sv'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/sfifo.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/sfifo.sv'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/polaris_uart_ip.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/polaris_uart_ip.sv'.
+SBY 23:45:27 [uart_prove] Copy '/home/ayuubmohamud/TileLinkIP/rtl/uart/tlul_slave_formal.sv' to '/home/ayuubmohamud/TileLinkIP/rtl/uart/uart_prove/src/tlul_slave_formal.sv'.
+SBY 23:45:27 [uart_prove] engine_0: smtbmc
+SBY 23:45:27 [uart_prove] base: starting process &quot;cd uart_prove/src; yosys -ql ../model/design.log ../model/design.ys&quot;
+SBY 23:45:27 [uart_prove] base: finished (returncode=0)
+SBY 23:45:27 [uart_prove] prep: starting process &quot;cd uart_prove/model; yosys -ql design_prep.log design_prep.ys&quot;
+SBY 23:45:27 [uart_prove] prep: finished (returncode=0)
+SBY 23:45:27 [uart_prove] smt2: starting process &quot;cd uart_prove/model; yosys -ql design_smt2.log design_smt2.ys&quot;
+SBY 23:45:27 [uart_prove] smt2: finished (returncode=0)
+SBY 23:45:27 [uart_prove] engine_0.basecase: starting process &quot;cd uart_prove; yosys-smtbmc --presat --unroll --noprogress -t 10  --append 0 --dump-vcd engine_0/trace.vcd --dump-yw engine_0/trace.yw --dump-vlogtb engine_0/trace_tb.v --dump-smtc engine_0/trace.smtc model/design_smt2.smt2&quot;
+SBY 23:45:27 [uart_prove] engine_0.induction: starting process &quot;cd uart_prove; yosys-smtbmc --presat --unroll -i --noprogress -t 10  --append 0 --dump-vcd engine_0/trace_induct.vcd --dump-yw engine_0/trace_induct.yw --dump-vlogtb engine_0/trace_induct_tb.v --dump-smtc engine_0/trace_induct.smtc model/design_smt2.smt2&quot;
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Solver: yices
+SBY 23:45:28 [uart_prove] engine_0.induction: ##   0:00:00  Solver: yices
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 0..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 0..
+SBY 23:45:28 [uart_prove] engine_0.induction: ##   0:00:00  Trying induction in step 10..
+SBY 23:45:28 [uart_prove] engine_0.induction: ##   0:00:00  Trying induction in step 9..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 1..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 1..
+SBY 23:45:28 [uart_prove] engine_0.induction: ##   0:00:00  Trying induction in step 8..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 2..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 2..
+SBY 23:45:28 [uart_prove] engine_0.induction: ##   0:00:00  Temporal induction successful.
+SBY 23:45:28 [uart_prove] engine_0.induction: ##   0:00:00  Status: passed
+SBY 23:45:28 [uart_prove] engine_0.induction: finished (returncode=0)
+SBY 23:45:28 [uart_prove] engine_0.induction: Status returned by engine for induction: pass
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 3..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 3..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 4..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 4..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 5..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 5..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 6..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 6..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 7..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 7..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 8..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 8..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assumptions in step 9..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Checking assertions in step 9..
+SBY 23:45:28 [uart_prove] engine_0.basecase: ##   0:00:00  Status: passed
+SBY 23:45:28 [uart_prove] engine_0.basecase: finished (returncode=0)
+SBY 23:45:28 [uart_prove] engine_0.basecase: Status returned by engine for basecase: pass
+SBY 23:45:28 [uart_prove] summary: Elapsed clock time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 23:45:28 [uart_prove] summary: Elapsed process time [H:MM:SS (secs)]: 0:00:00 (0)
+SBY 23:45:28 [uart_prove] summary: engine_0 (smtbmc) returned pass for basecase
+SBY 23:45:28 [uart_prove] summary: engine_0 (smtbmc) returned pass for induction
+SBY 23:45:28 [uart_prove] summary: engine_0 did not produce any traces
+SBY 23:45:28 [uart_prove] summary: successful proof by k-induction.
+SBY 23:45:28 [uart_prove] DONE (PASS, rc=0)
+</system-out>
+<system-err>
+</system-err>
+</testsuite>
+</testsuites>
