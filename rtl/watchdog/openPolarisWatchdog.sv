@@ -8,6 +8,7 @@ module openPolarisWatchdog #(
 
     // Slave interface
     input   wire logic [2:0]                    watchdog_a_opcode,
+    /* verilator lint_off UNUSEDSIGNAL */
     input   wire logic [2:0]                    watchdog_a_param,
     input   wire logic [TL_SZ-1:0]              watchdog_a_size,
     input   wire logic [TL_RS-1:0]              watchdog_a_source,
@@ -15,6 +16,7 @@ module openPolarisWatchdog #(
     input   wire logic [3:0]                    watchdog_a_mask,
     input   wire logic [31:0]                   watchdog_a_data,
     input   wire logic                          watchdog_a_corrupt,
+    /* verilator lint_on UNUSEDSIGNAL */
     input   wire logic                          watchdog_a_valid,
     output  wire logic                          watchdog_a_ready,
 
@@ -73,7 +75,7 @@ module openPolarisWatchdog #(
                 petting_timer[i][31:0] <= working_data;
             end else if (watchdog_d_ready&working_valid&(working_address[4:2]==3'b010)&(working_opcode==3'd0||working_opcode==3'd1) && (index==i)) begin
                 petting_timer[i][63:32] <= working_data;
-            end else if (petting_timer[i]!=0 && enable_watchdog) begin
+            end else if (petting_timer[i]!=0 && enable_watchdog[i]) begin
                 petting_timer[i] <= petting_timer[i] - 1'b1;
             end
         end
@@ -87,25 +89,63 @@ module openPolarisWatchdog #(
                 watchdog_timer[i][31:0] <= working_data;
             end else if (watchdog_d_ready&working_valid&(working_address[4:2]==3'b100)&(working_opcode==3'd0||working_opcode==3'd1) && (index==i)) begin
                 watchdog_timer[i][63:32] <= working_data;
-            end else if (petting_timer[i]==0 && enable_watchdog) begin
+            end else if (petting_timer[i]==0 && watchdog_timer[i]!=0 && enable_watchdog[i]) begin
                 watchdog_timer[i] <= watchdog_timer[i] - 1'b1;
             end
         end
     end
 
     for (genvar i = 0; i < NOC; i++) begin : petIrq
-        assign irq_o[i] = petting_timer[i]==0;
+        assign irq_o[i] = (petting_timer[i]==0)&&enable_watchdog[i];
     end
 
     wire [NOC-1:0] reset_system;
     for (genvar i = 0; i < NOC; i++) begin : crmIrq
-        assign reset_system[i] = watchdog_timer[i]==0;
+        assign reset_system[i] = (watchdog_timer[i]==0)&&enable_watchdog[i];
     end
     assign crm_o = |reset_system;
 
+
     always_ff @(posedge watchdog_clock_i) begin
         if (watchdog_reset_i) begin
-            
+            watchdog_d_valid <= 1'b0;
+        end
+        else if (working_valid&&watchdog_d_ready) begin
+            watchdog_d_corrupt <= 1'b0;
+            watchdog_d_opcode <= {2'b00, watchdog_a_opcode==3'd4};
+            watchdog_d_param <= 2'b00;
+            watchdog_d_size <= 4'd2;
+            watchdog_d_source <= working_source;
+            case (watchdog_a_address[4:2])
+                3'b000: begin
+                    watchdog_d_data <= {31'd0, enable_watchdog[index]};
+                    watchdog_d_denied <= 1'b0;
+                end 
+                3'b001: begin
+                    watchdog_d_data <= petting_timer[index][31:0];
+                    watchdog_d_denied <= 1'b0;
+                end
+                3'b010: begin
+                    watchdog_d_data <= petting_timer[index][63:32];
+                    watchdog_d_denied <= 1'b0;
+                end
+                3'b011: begin
+                    watchdog_d_data <= watchdog_timer[index][31:0];
+                    watchdog_d_denied <= 1'b0;
+                end
+                3'b100: begin
+                    watchdog_d_data <= watchdog_timer[index][63:32];
+                    watchdog_d_denied <= 1'b0;
+                end
+                default: begin
+                    watchdog_d_data <= 0;
+                    watchdog_d_denied <= 1'b1;
+                end
+            endcase
+            watchdog_d_valid <= 1'b1;
+        end
+        else if (!working_valid&&watchdog_d_ready) begin
+            watchdog_d_valid <= 1'b0;
         end
     end
 `ifdef FORMAL
@@ -134,7 +174,5 @@ module openPolarisWatchdog #(
         watchdog_d_ready,
         outstanding
     );
-
-
 `endif
 endmodule
