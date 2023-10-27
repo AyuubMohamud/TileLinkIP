@@ -54,6 +54,8 @@ module openPolarisSPI #(
 
     reg [3:0] clock_divider;
     reg [15:0] spi_config;
+    reg [31:0] spi_tx;
+    wire [31:0] spi_rx;
 `ifdef FORMAL
     wire [TL_RS:0] outstanding;
     tlul_slave_formal #(.AW(4), .RS(TL_RS), .MAX(2)) formal (
