@@ -1,7 +1,6 @@
 module openPolarisSPI #(
     parameter TL_RS = 4,
-    parameter TL_SZ = 4,
-    parameter CS = 2
+    parameter TL_SZ = 4
     ) (
     input   wire logic                          spi_clock_i,
     input   wire logic                          spi_reset_i,
@@ -9,7 +8,7 @@ module openPolarisSPI #(
     // Slave interface
     input   wire logic [2:0]                    spi_a_opcode,
     input   wire logic [2:0]                    spi_a_param,
-    input   wire logic [TL_SZ-1:0]              spi_a_size,
+    input   wire logic [3:0]                    spi_a_size,
     input   wire logic [TL_RS-1:0]              spi_a_source,
     input   wire logic [3:0]                    spi_a_address,
     input   wire logic [3:0]                    spi_a_mask,

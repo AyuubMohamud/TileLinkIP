@@ -1,6 +1,5 @@
 module openPolarisSRAM #(
     parameter TL_RS = 4,
-    parameter TL_SZ = 4,
     parameter TL_AW = 2
     ) (
     input   wire logic                          sram_clock_i,
@@ -9,7 +8,7 @@ module openPolarisSRAM #(
     // Slave interface
     input   wire logic [2:0]                    sram_a_opcode,
     input   wire logic [2:0]                    sram_a_param,
-    input   wire logic [TL_SZ-1:0]              sram_a_size,
+    input   wire logic [3:0]                    sram_a_size,
     input   wire logic [TL_RS-1:0]              sram_a_source,
     input   wire logic [TL_AW-1:0]              sram_a_address,
     input   wire logic [3:0]                    sram_a_mask,
@@ -22,7 +21,7 @@ module openPolarisSRAM #(
 
     output       logic [2:0]                    sram_d_opcode,
     output       logic [1:0]                    sram_d_param,
-    output       logic [TL_SZ-1:0]              sram_d_size,
+    output       logic [3:0]                    sram_d_size,
     output       logic [TL_RS-1:0]              sram_d_source,
     output       logic                          sram_d_denied,
     output       logic [31:0]                   sram_d_data,
@@ -43,14 +42,14 @@ module openPolarisSRAM #(
     initial atomic_in_progress = 0;
     wire sram_busy;
     wire [TL_RS-1:0] working_source;
-    wire [TL_SZ-1:0] working_size;
+    wire [3:0] working_size;
     wire [31:0] working_data;
     wire [3:0] working_mask;
     wire [2:0] working_opcode;
     wire [TL_AW-1:0] working_address;
     wire [2:0] working_param;
     wire working_valid;
-    skdbf #(TL_RS+TL_SZ+42+TL_AW) skidbuffer (sram_clock_i, sram_reset_i|reset, ~sram_d_ready|reset|pause|read, {
+    skdbf #(TL_RS+4+42+TL_AW) skidbuffer (sram_clock_i, sram_reset_i|reset, ~sram_d_ready|reset|pause|read, {
         working_source,
         working_size,
         working_data,
