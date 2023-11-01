@@ -28,12 +28,15 @@ module openPolarisPWM #(
     output       logic                          pwm_d_valid,
     input   wire logic                          pwm_d_ready,
 
-    output  wire logic                          int_o
+    output  wire logic                          int_o,
+
+    output  wire logic                          pin_o
 );
     /*
-        CSR 0: Reload value[31:2], 8/16 bit samples, PWM enable
+        CSR 0: Reload value[12:1], Int ENABLE, PWM enable
         CSR 1: Sample FIFO
     */
+    // Requires testing
     wire pwm_busy;
     wire [TL_RS-1:0] working_source;
     wire [3:0] working_size;
@@ -55,7 +58,7 @@ module openPolarisPWM #(
         pwm_a_source, pwm_a_size, pwm_a_data, pwm_a_mask, pwm_a_opcode, pwm_a_address, pwm_a_param
     }, pwm_a_valid);
     assign pwm_a_ready = ~pwm_busy;
-    reg [31:0] cfg_pwm;
+    reg [13:0] cfg_pwm;
     wire write_en = working_valid&pwm_d_ready&(pwm_a_address)&(pwm_a_opcode==3'd1||pwm_a_opcode==3'd0);
     wire full;
     wire sample_accept;
@@ -70,7 +73,7 @@ module openPolarisPWM #(
             cfg_pwm <= 0;
         end
         else if (working_valid&pwm_d_ready&!(pwm_a_address)&(pwm_a_opcode==3'd1||pwm_a_opcode==3'd0)) begin
-            cfg_pwm <= working_data;
+            cfg_pwm <= working_data[13:0];
         end
     end
 
@@ -78,7 +81,7 @@ module openPolarisPWM #(
         if (pwm_reset_i) begin
             pwm_d_valid <= 1'b0;
         end else if (working_valid&pwm_d_ready) begin
-            pwm_d_data <= working_address ? {30'h0, full, empty} : cfg_pwm;
+            pwm_d_data <= working_address ? {30'h0, full, empty} : {18'd0, cfg_pwm};
             pwm_d_denied <= 0;
             pwm_d_corrupt <= 0;
             pwm_d_opcode <= {2'd0,working_opcode==3'd4};
@@ -90,8 +93,24 @@ module openPolarisPWM #(
             pwm_d_valid <= 1'b0;
         end
     end
-    //! Condition for correct execution
-    //! MAX_SAMPLE < RELOAD_VALUE
+    reg [11:0] counter;
+    initial counter = 0;
+    reg [7:0] sample;
+    initial sample = 0;
     always_ff @(posedge pwm_clock_i) begin
+        if (pwm_reset_i|cfg_pwm[0]) begin
+            counter <= 0;
+            sample <= 0;
+        end
+        else if (counter == cfg_pwm[13:2]) begin
+            counter <= 0;
+            sample <= sample_data;
+        end else begin
+            counter <= counter + 1'b1;
+        end
     end
+
+    assign sample_accept = counter == cfg_pwm[13:2];
+    assign pin_o = (counter[7:0] < sample);
+    assign int_o = empty&cfg_pwm[1]&cfg_pwm[0];
 endmodule
