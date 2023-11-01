@@ -26,6 +26,9 @@ module openPolarisFlash #(
     output       logic                          sck,
     output       logic                          cs_n
 );
+    initial mosi = 0;
+    initial sck = 1;
+    initial cs_n = 1;
     wire fctrl_busy;
     wire [TL_RS-1:0] working_source;
     wire [3:0] working_size;
@@ -53,7 +56,7 @@ module openPolarisFlash #(
     initial source = 0;
     reg [3:0] size;
     initial size = 0;
-    reg [5:0] counter;
+    reg [4:0] counter;
     initial counter = 0;
     reg fin;
     initial fin = 0;
@@ -81,21 +84,24 @@ module openPolarisFlash #(
                 mosi <= spi_cmd[31];
             end
             spi_cmd <= {spi_cmd[30:0], 1'b0};
-            if (counter==6'b111111) begin
+            if (counter==5'b11111 && sck) begin
+                counter <= 0;
                 cmd <= 0;
+            end else if (~sck) begin
+                counter <= counter + 1'b1;
             end
-            counter <= counter + 1'b1;
         end else if (busy&!cmd&!fin) begin
-            sck <= ~sck;
             if (sck) begin
                 {spi_cmd} <= {spi_cmd[30:0], miso};
             end
-            if (counter==6'b111111) begin
+            if (counter==5'b11111 && ~sck) begin
                 cmd <= 0;
                 cs_n <= 1;
                 fin <= 1;
+            end else if (sck) begin
+                counter <= counter + 1'b1;
             end
-            counter <= counter + 1'b1;
+            sck <= ~sck;
         end else if (busy&fin&!(~fctrl_d_ready)) begin
             sck <= 1'b1;
             fctrl_d_corrupt <= 0;
