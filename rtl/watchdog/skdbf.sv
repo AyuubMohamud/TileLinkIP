@@ -15,6 +15,7 @@ module skdbf #(parameter DW = 8) (
     reg held_vld;
     initial held_vld = 0;
     initial held_data = 0;
+
     assign cycle_data_o = held_vld ? held_data : registered_data_i;
     assign cycle_vld_o = held_vld ? 1'b1 : registered_vld_i;
 
