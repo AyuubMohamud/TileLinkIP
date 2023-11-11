@@ -21,15 +21,17 @@ module i2cphy (
     output       logic                  scl_t
 
 );
-    reg [2:0] i2c_phy;
+    reg [2:0] i2c_phy_state;
     localparam I2C_IDLE = 3'b000;
     localparam I2C_START = 3'b001;
     localparam I2C_TX = 3'b010;
     localparam I2C_AWAIT_ACK = 3'b011;
     localparam I2C_RX = 3'b100;
-    localparam I2C_
+    localparam I2C_TX_ACK = 3'b101;
+    localparam I2C_ABORT = 3'b110;
+    // When undriven, sda/scl
     always_ff @(posedge i2c_clock_i) begin
-        
-
+        case (i2c_phy_state)
+        endcase
     end
 endmodule
