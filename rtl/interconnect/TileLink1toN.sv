@@ -1,13 +1,15 @@
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
 module TileLink1toN #(
-    parameter [(32*2)-1:0] slave_addresses = {
+    parameter N = 2,
+    parameter [(32*N)-1:0] slave_addresses = {
         32'h00001000,
         32'h00002000
     }, //! Base addresses of mentioned slaves
-    parameter [(32*2)-1:0] slave_end_addresses = {
+    parameter [(32*N)-1:0] slave_end_addresses = {
         32'h00002000,
         32'h10000000
     },
-    parameter N = 2,
     parameter TL_DW = 32,
     parameter TL_AW = 32,
     parameter TL_RS = 4,
@@ -21,8 +23,8 @@ module TileLink1toN #(
     input   wire logic [TL_SZ-1:0]              master_a_size,
     input   wire logic [TL_RS-1:0]              master_a_source,
     input   wire logic [TL_AW-1:0]              master_a_address,
-    input   wire logic [TL_DW/8-1:0]       master_a_mask,
-    input   wire logic [TL_DW-1:0]         master_a_data,
+    input   wire logic [TL_DW/8-1:0]            master_a_mask,
+    input   wire logic [TL_DW-1:0]              master_a_data,
     input   wire logic                          master_a_corrupt,
     input   wire logic                          master_a_valid,
     output  wire logic                          master_a_ready,

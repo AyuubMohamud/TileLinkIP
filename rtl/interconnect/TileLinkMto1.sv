@@ -1,4 +1,6 @@
-module TileLink1toN #(
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
+module TileLinkMto1 #(
     parameter M = 2,
     parameter TL_DW = 32,
     parameter TL_AW = 32,
