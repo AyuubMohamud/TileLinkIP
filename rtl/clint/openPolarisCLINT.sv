@@ -2,42 +2,60 @@
 // Licensed under CERN-OHL-W version 2
 `include "clint_defines.sv"
 
-module openPolarisCLINT #(parameter HARTNO = 2) (
-    input   wire logic                      clint_clk_i,
-    input   wire logic                      clint_rst_i,
+module openPolarisCLINT #(parameter HARTNO = 2,
+    parameter TL_RS = 4
+    ) (
+    input   wire logic                          clint_clock_i,
+    input   wire logic                          clint_reset_i,
 
-    input   tluh::tluh_m2s                  tluh_i,
-    input   wire logic                      clint_d_ready,
-    output  tluh::tluh_s2m                  tluh_o,
-    output  wire logic                      clint_a_ready,
-
-    output  wire logic [HARTNO-1:0]         hart_mti,
-    output  wire logic [HARTNO-1:0]         hart_msip
-);
-    wire [61+clint_defines::TL_RS-1:0] working_data;
-    wire working_vld;
-    wire busy = !clint_d_ready;
-    skdbf #(.DW(61+clint_defines::TL_RS)) tl_skidbuffer (clint_clk_i, clint_rst_i, busy, working_data, working_vld, !clint_a_ready, {
-        tluh_i.a_opcode, //3
-        tluh_i.a_param, //3
-        tluh_i.a_size, 
-        tluh_i.a_source,
-        tluh_i.a_address, //16
-        tluh_i.a_mask, //4
-        tluh_i.a_data, //32
-        tluh_i.a_corrupt //1
-    }, tluh_i.a_valid);
-    localparam bvsize = 61+clint_defines::TL_RS-1;
-    tluh::tluh_a_op working_opcode = tluh::tluh_a_op'(working_data[bvsize:bvsize-2]);
-    wire [2:0] working_param = working_data[bvsize-3:bvsize-5];
-    wire [1:0] working_size = working_data[bvsize-6:bvsize-7];
-    wire [clint_defines::TL_RS-1:0] working_source = working_data[bvsize-8:bvsize-8-clint_defines::TL_RS+1];
-    wire [15:0] working_address = working_data[bvsize-8-clint_defines::TL_RS:bvsize-8-clint_defines::TL_RS-15];
+    // Slave interface
+    input   wire logic [2:0]                    clint_a_opcode,
+    input   wire logic [2:0]                    clint_a_param,
+    input   wire logic [3:0]                    clint_a_size,
+    input   wire logic [TL_RS-1:0]              clint_a_source,
+    input   wire logic [15:0]                   clint_a_address,
+    input   wire logic [3:0]                    clint_a_mask,
+    input   wire logic [31:0]                   clint_a_data,
     /* verilator lint_off UNUSEDSIGNAL */
-    wire [3:0] working_mask = working_data[bvsize-8-clint_defines::TL_RS-16:bvsize-8-clint_defines::TL_RS-16-3];
+    input   wire logic                          clint_a_corrupt,
     /* verilator lint_on UNUSEDSIGNAL */
-    wire [31:0] working_tldata = working_data[bvsize-8-clint_defines::TL_RS-16-4:bvsize-8-clint_defines::TL_RS-16-4-31];
-    wire working_corrupt = working_data[0];
+    input   wire logic                          clint_a_valid,
+    output  wire logic                          clint_a_ready,
+
+    output       logic [2:0]                    clint_d_opcode,
+    output       logic [1:0]                    clint_d_param,
+    output       logic [3:0]                    clint_d_size,
+    output       logic [TL_RS-1:0]              clint_d_source,
+    output       logic                          clint_d_denied,
+    output       logic [31:0]                   clint_d_data,
+    output       logic                          clint_d_corrupt,
+    output       logic                          clint_d_valid,
+    input   wire logic                          clint_d_ready,
+
+    output  wire logic [HARTNO-1:0]             msip,
+    output  wire logic [HARTNO-1:0]             mtip          
+);
+    wire clint_busy;
+    wire [TL_RS-1:0] working_source;
+    wire [3:0] working_size;
+    wire [31:0] working_data;
+    wire [3:0] working_mask;
+    wire [2:0] working_opcode;
+    wire [15:0] working_address;
+    wire [2:0] working_param;
+    wire working_valid;
+    skdbf #(TL_RS+4+39+17+2) skidbuffer (clint_clock_i, clint_reset_i, ~clint_d_ready, {
+        working_source,
+        working_size,
+        working_data,
+        working_mask,
+        working_opcode,
+        working_param,
+        working_address
+    }, working_valid, clint_busy, {
+        clint_a_source, clint_a_size, clint_a_data, clint_a_mask, clint_a_opcode, clint_a_param, clint_a_address
+    }, clint_a_valid);
+    assign clint_a_ready = ~clint_busy;
 
     localparam CSR_MTIMEL =     16'hBFF8;
     localparam CSR_MTIMEH =     16'hBFFC;
@@ -49,14 +67,14 @@ module openPolarisCLINT #(parameter HARTNO = 2) (
     reg [31:0] mtimecmph [0:HARTNO-1];
 
     reg [63:0] mtime;
-    always_ff @(posedge clint_clk_i) begin
-        if (clint_rst_i) begin
+    always_ff @(posedge clint_clock_i) begin
+        if (clint_reset_i) begin
             mtime <= 64'h0000000000000000;
         end
-        else if (working_vld&!busy&(
-            working_opcode==tluh::PutFullData
-            ||working_opcode==tluh::LogicalData
-            )&(working_address==16'hBFF8||working_address==16'hBFFC)&!working_corrupt) begin
+        else if (working_valid&clint_d_ready&(
+            working_opcode==0
+            ||working_opcode==1
+            )&(working_address==16'hBFF8||working_address==16'hBFFC)) begin
             mtime[31:0] <= working_address==16'hBFF8 ? write_value_machine : mtime[31:0];
             mtime[63:32] <= working_address==16'hBFFC ? write_value_machine : mtime[63:32];
         end else begin
@@ -82,18 +100,18 @@ module openPolarisCLINT #(parameter HARTNO = 2) (
     always_comb begin
         case (working_opcode)
             tluh::PutFullData:   begin
-                write_value_machine = working_tldata;
+                write_value_machine = working_data;
             end
             tluh::LogicalData:   begin
                 if (working_param==3'd0) begin
-                    write_value_machine = read_machine^working_tldata;
+                    write_value_machine = read_machine^working_data;
                 end else if (working_param==3'd1) begin
-                    write_value_machine = read_machine|working_tldata;
+                    write_value_machine = read_machine|working_data;
                 end else if (working_param==3'd2) begin
-                    write_value_machine = read_machine&working_tldata;
+                    write_value_machine = read_machine&working_data;
                 end
                 else begin
-                    write_value_machine = working_tldata;
+                    write_value_machine = working_data;
                 end
             end                
             default: begin
@@ -102,10 +120,10 @@ module openPolarisCLINT #(parameter HARTNO = 2) (
         endcase
     end
 
-    always_ff @(posedge clint_clk_i) begin
-        if (working_vld&!busy&(            
-            working_opcode==tluh::PutFullData
-            ||working_opcode==tluh::LogicalData)&!working_corrupt) begin
+    always_ff @(posedge clint_clock_i) begin
+        if (working_valid&clint_d_ready&(            
+            working_opcode==0
+            ||working_opcode==1)) begin
                 if (msip_accessed) begin
                     msip_vector[working_address[$clog2(HARTNO)+1:2]] <= write_value_machine[0];
                 end else if (working_address<16'hBFF8) begin
@@ -115,24 +133,23 @@ module openPolarisCLINT #(parameter HARTNO = 2) (
         end
     end
 
-    always_ff @(posedge clint_clk_i) begin
-        if (working_vld&!busy) begin
-            tluh_o.d_data <= read_machine;
-            tluh_o.d_opcode <= working_opcode==tluh::PutFullData ? tluh::AccessAck : tluh::AccessAckData;
-            tluh_o.d_size <= working_size;
-            tluh_o.d_source <= working_source;
-            tluh_o.d_sink <= 1'b0;
-            tluh_o.d_param <= 2'b0;
-            tluh_o.d_denied <= working_corrupt;
-            tluh_o.d_corrupt <= 1'b0;
-            tluh_o.d_valid <= 1'b1;
+    always_ff @(posedge clint_clock_i) begin
+        if (working_valid&clint_d_ready) begin
+            clint_d_data <= read_machine;
+            clint_d_opcode <= {2'b00, working_opcode==4};
+            clint_d_size <= working_size;
+            clint_d_source <= working_source;
+            clint_d_param <= 2'b0;
+            clint_d_denied <= 0;
+            clint_d_corrupt <= 1'b0;
+            clint_d_valid <= 1'b1;
         end
-        else if (!working_vld&!busy) begin
-            tluh_o.d_valid <= 1'b0;
+        else if (!working_valid&clint_d_ready) begin
+            clint_d_valid <= 1'b0;
         end
     end
-    assign hart_msip = msip_vector;
+    assign msip = msip_vector;
     for (genvar i = 0; i < HARTNO; i++) begin : time_comparison
-        assign hart_mti[i] = mtime >= {mtimecmph, mtimecmpl};
+        assign mtip[i] = mtime >= {mtimecmph, mtimecmpl};
     end
 endmodule

@@ -8,7 +8,7 @@ module openPolarisGPIO #(parameter TL_RS = 4) (
     input   wire logic [2:0]                    gpio_a_param,
     input   wire logic [3:0]                    gpio_a_size,
     input   wire logic [TL_RS-1:0]              gpio_a_source,
-    input   wire logic                          gpio_a_address,
+    input   wire logic [1:0]                    gpio_a_address,
     input   wire logic [3:0]                    gpio_a_mask,
     input   wire logic [31:0]                   gpio_a_data,
     input   wire logic                          gpio_a_corrupt,
@@ -26,8 +26,9 @@ module openPolarisGPIO #(parameter TL_RS = 4) (
     output       logic                          gpio_d_valid,
     input   wire logic                          gpio_d_ready,
 
-    output  wire logic [15:0]                   outputs_o,
-    input   wire logic [15:0]                   inputs_i
+    output  wire logic [31:0]                   outputs_o,
+    output  wire logic [31:0]                   t_o,
+    input   wire logic [31:0]                   inputs_i
 );
     wire gpio_busy;
     wire [TL_RS-1:0] working_source;
@@ -35,9 +36,9 @@ module openPolarisGPIO #(parameter TL_RS = 4) (
     wire [31:0] working_data;
     wire [3:0] working_mask;
     wire [2:0] working_opcode;
-    wire working_address;
+    wire [1:0] working_address;
     wire working_valid;
-    skdbf #(TL_RS+4+39+1) skidbuffer (gpio_clock_i, gpio_reset_i, ~gpio_d_ready, {
+    skdbf #(TL_RS+4+39+2) skidbuffer (gpio_clock_i, gpio_reset_i, ~gpio_d_ready, {
         working_source,
         working_size,
         working_data,
@@ -49,17 +50,25 @@ module openPolarisGPIO #(parameter TL_RS = 4) (
     }, gpio_a_valid);
     assign gpio_a_ready = ~gpio_busy;
 
-    reg [15:0] outputs;
-    
+    reg [31:0] outputs;
+    reg [31:0] t_state;
+    initial t_state = 32'hFFFFFFFF;
     always_ff @(posedge gpio_clock_i) begin
         if (gpio_reset_i) begin
             outputs <= 0;
         end
-        else if (working_valid&gpio_d_ready&!(gpio_a_address)&(working_opcode==3'd0||working_opcode==3'd1)) begin
-            outputs <= working_data[15:0];
+        else if (working_valid&gpio_d_ready&!(gpio_a_address==2'b01)&(working_opcode==3'd0||working_opcode==3'd1)) begin
+            outputs <= working_data;
         end
     end
-    
+    always_ff @(posedge gpio_clock_i) begin
+        if (gpio_reset_i) begin
+            t_state <= 32'hFFFFFFFF;
+        end
+        else if (working_valid&gpio_d_ready&!(gpio_a_address==2'b10)&(working_opcode==3'd0||working_opcode==3'd1)) begin
+            t_state <= working_data;
+        end
+    end
     always_ff @(posedge gpio_clock_i) begin
         if (gpio_reset_i) begin
             gpio_d_valid <= 0;
@@ -71,14 +80,14 @@ module openPolarisGPIO #(parameter TL_RS = 4) (
             gpio_d_corrupt <= 0;
             gpio_d_opcode <= 0;
             gpio_d_param <= 0;
-            gpio_d_data <= working_address ? {16'h0000, inputs_i} : {16'h0000, outputs};
+            gpio_d_data <= working_address==2'b01 ? inputs_i : working_address==2'b10 ? t_state : outputs;
         end else if (!working_valid&gpio_d_ready) begin
             gpio_d_valid <= 0;
         end
     end
 
     assign outputs_o = outputs;
-
+    assign t_o = t_state;
 `ifdef FORMAL
     wire [TL_RS:0] outstanding;
     tlul_slave_formal #(.AW(1), .RS(TL_RS), .MAX(2)) formal (
