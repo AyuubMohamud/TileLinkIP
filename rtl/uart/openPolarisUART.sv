@@ -52,8 +52,6 @@ module openPolarisUART #(
     }, uart_a_valid);
     assign uart_a_ready = ~uart_busy;
 
-    wire core_ready = uart_d_ready;
-
     reg [14:0] polarisUartCSR;
     initial polarisUartCSR = 0;
     localparam Get = 3'd4;

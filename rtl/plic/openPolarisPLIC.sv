@@ -68,13 +68,13 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
 
     reg [6:0] ie_m_mode_hart_0;
     reg [6:0] ie_s_mode_hart_0;
-    reg [6:0] ie_m_mode_hart_1;
-    reg [6:0] ie_s_mode_hart_1;
+    //reg [6:0] ie_m_mode_hart_1;
+    //reg [6:0] ie_s_mode_hart_1;
 
     reg priority_threshold_m_mode_hart_0;
     reg priority_threshold_s_mode_hart_0;
-    reg priority_threshold_m_mode_hart_1;
-    reg priority_threshold_s_mode_hart_1;
+    //reg priority_threshold_m_mode_hart_1;
+    //reg priority_threshold_s_mode_hart_1;
 
     logic [7:0] read_machine;
     localparam CSR_INTERRUPT_PRIORITY_1 = 22'h000004;
@@ -87,25 +87,25 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
     localparam CSR_INTERRUPT_PENDING = 22'h001000;
     localparam CSR_INTERRUPT_ENABLE_HART0_M = 22'h002000;
     localparam CSR_INTERRUPT_ENABLE_HART0_S = 22'h002080;
-    localparam CSR_INTERRUPT_ENABLE_HART1_M = 22'h002100;
-    localparam CSR_INTERRUPT_ENABLE_HART1_S = 22'h002180;
+    //localparam CSR_INTERRUPT_ENABLE_HART1_M = 22'h002100;
+    //localparam CSR_INTERRUPT_ENABLE_HART1_S = 22'h002180;
     localparam CSR_PRIORITY_THRESHOLD_HART0_M = 22'h200000;
     localparam CSR_CLAIM_COMPLETE_HART0_M = 22'h200004;
     localparam CSR_PRIORITY_THRESHOLD_HART0_S = 22'h201000;
     localparam CSR_CLAIM_COMPLETE_HART0_S = 22'h201004;
-    localparam CSR_PRIORITY_THRESHOLD_HART1_M = 22'h202000;
-    localparam CSR_CLAIM_COMPLETE_HART1_M = 22'h202004;
-    localparam CSR_PRIORITY_THRESHOLD_HART1_S = 22'h203000;
-    localparam CSR_CLAIM_COMPLETE_HART1_S = 22'h203004;
+    //localparam CSR_PRIORITY_THRESHOLD_HART1_M = 22'h202000;
+    //localparam CSR_CLAIM_COMPLETE_HART1_M = 22'h202004;
+    //localparam CSR_PRIORITY_THRESHOLD_HART1_S = 22'h203000;
+    //localparam CSR_CLAIM_COMPLETE_HART1_S = 22'h203004;
 
     logic [2:0] interrupt_claim_cxt0;
     reg [7:0] claimed_bm_cxt0;
     logic [2:0] interrupt_claim_cxt1;
     reg [7:0] claimed_bm_cxt1;
-    logic [2:0] interrupt_claim_cxt2;
-    reg [7:0] claimed_bm_cxt2;
-    logic [2:0] interrupt_claim_cxt3;
-    reg [7:0] claimed_bm_cxt3;
+    //logic [2:0] interrupt_claim_cxt2;
+    //reg [7:0] claimed_bm_cxt2;
+    //logic [2:0] interrupt_claim_cxt3;
+    //reg [7:0] claimed_bm_cxt3;
 
     wire [7:0] priorites = {source7_priority, source6_priority, source5_priority, source4_priority, source3_priority, source2_priority, source1_priority, 1'b0};
     always_comb begin
@@ -161,58 +161,58 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
                 interrupt_claim_cxt1 = 3'b000;
             end
         endcase
-        casez ({interrupt_pending&priorites&~claimed_bm_cxt2&{ie_m_mode_hart_1,1'b0}})
-            8'b1zzzzzzz: begin
-                interrupt_claim_cxt2 = 3'b111;
-            end 
-            8'b01zzzzzz: begin
-                interrupt_claim_cxt2 = 3'b110;
-            end
-            8'b001zzzzz: begin
-                interrupt_claim_cxt2 = 3'b101;
-            end
-            8'b0001zzzz: begin
-                interrupt_claim_cxt2 = 3'b100;
-            end
-            8'b00001zzz: begin
-                interrupt_claim_cxt2 = 3'b011;
-            end
-            8'b000001zz: begin
-                interrupt_claim_cxt2 = 3'b010;
-            end
-            8'b0000001z: begin
-                interrupt_claim_cxt2 = 3'b001;
-            end
-            default: begin
-                interrupt_claim_cxt2 = 3'b000;
-            end
-        endcase
-        casez ({interrupt_pending&priorites&~claimed_bm_cxt3&{ie_s_mode_hart_1,1'b0}})
-            8'b1zzzzzzz: begin
-                interrupt_claim_cxt3 = 3'b111;
-            end 
-            8'b01zzzzzz: begin
-                interrupt_claim_cxt3 = 3'b110;
-            end
-            8'b001zzzzz: begin
-                interrupt_claim_cxt3 = 3'b101;
-            end
-            8'b0001zzzz: begin
-                interrupt_claim_cxt3 = 3'b100;
-            end
-            8'b00001zzz: begin
-                interrupt_claim_cxt3 = 3'b011;
-            end
-            8'b000001zz: begin
-                interrupt_claim_cxt3 = 3'b010;
-            end
-            8'b0000001z: begin
-                interrupt_claim_cxt3 = 3'b001;
-            end
-            default: begin
-                interrupt_claim_cxt3 = 3'b000;
-            end
-        endcase
+        //casez ({interrupt_pending&priorites&~claimed_bm_cxt2&{ie_m_mode_hart_1,1'b0}})
+        //    8'b1zzzzzzz: begin
+        //        interrupt_claim_cxt2 = 3'b111;
+        //    end 
+        //    8'b01zzzzzz: begin
+        //        interrupt_claim_cxt2 = 3'b110;
+        //    end
+        //    8'b001zzzzz: begin
+        //        interrupt_claim_cxt2 = 3'b101;
+        //    end
+        //    8'b0001zzzz: begin
+        //        interrupt_claim_cxt2 = 3'b100;
+        //    end
+        //    8'b00001zzz: begin
+        //        interrupt_claim_cxt2 = 3'b011;
+        //    end
+        //    8'b000001zz: begin
+        //        interrupt_claim_cxt2 = 3'b010;
+        //    end
+        //    8'b0000001z: begin
+        //        interrupt_claim_cxt2 = 3'b001;
+        //    end
+        //    default: begin
+        //        interrupt_claim_cxt2 = 3'b000;
+        //    end
+        //endcase
+        //casez ({interrupt_pending&priorites&~claimed_bm_cxt3&{ie_s_mode_hart_1,1'b0}})
+        //    8'b1zzzzzzz: begin
+        //        interrupt_claim_cxt3 = 3'b111;
+        //    end 
+        //    8'b01zzzzzz: begin
+        //        interrupt_claim_cxt3 = 3'b110;
+        //    end
+        //    8'b001zzzzz: begin
+        //        interrupt_claim_cxt3 = 3'b101;
+        //    end
+        //    8'b0001zzzz: begin
+        //        interrupt_claim_cxt3 = 3'b100;
+        //    end
+        //    8'b00001zzz: begin
+        //        interrupt_claim_cxt3 = 3'b011;
+        //    end
+        //    8'b000001zz: begin
+        //        interrupt_claim_cxt3 = 3'b010;
+        //    end
+        //    8'b0000001z: begin
+        //        interrupt_claim_cxt3 = 3'b001;
+        //    end
+        //    default: begin
+        //        interrupt_claim_cxt3 = 3'b000;
+        //    end
+        //endcase
     end
 
     always_comb begin
@@ -227,16 +227,16 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
             CSR_INTERRUPT_PENDING:          read_machine = interrupt_pending;
             CSR_INTERRUPT_ENABLE_HART0_M:   read_machine = {ie_m_mode_hart_0, 1'b0};
             CSR_INTERRUPT_ENABLE_HART0_S:   read_machine = {ie_s_mode_hart_0, 1'b0};
-            CSR_INTERRUPT_ENABLE_HART1_M:   read_machine = {ie_m_mode_hart_1, 1'b0};
-            CSR_INTERRUPT_ENABLE_HART1_S:   read_machine = {ie_s_mode_hart_1, 1'b0};
+            //CSR_INTERRUPT_ENABLE_HART1_M:   read_machine = {ie_m_mode_hart_1, 1'b0};
+            //CSR_INTERRUPT_ENABLE_HART1_S:   read_machine = {ie_s_mode_hart_1, 1'b0};
             CSR_PRIORITY_THRESHOLD_HART0_M: read_machine = {7'h00, priority_threshold_m_mode_hart_0};
             CSR_PRIORITY_THRESHOLD_HART0_S: read_machine = {7'h00, priority_threshold_s_mode_hart_0};
-            CSR_PRIORITY_THRESHOLD_HART1_M: read_machine = {7'h00, priority_threshold_m_mode_hart_1};
-            CSR_PRIORITY_THRESHOLD_HART1_S: read_machine = {7'h00, priority_threshold_s_mode_hart_1};
+            //CSR_PRIORITY_THRESHOLD_HART1_M: read_machine = {7'h00, priority_threshold_m_mode_hart_1};
+            //CSR_PRIORITY_THRESHOLD_HART1_S: read_machine = {7'h00, priority_threshold_s_mode_hart_1};
             CSR_CLAIM_COMPLETE_HART0_M:     read_machine = {5'b00000, interrupt_claim_cxt0};
             CSR_CLAIM_COMPLETE_HART0_S:     read_machine = {5'b00000, interrupt_claim_cxt1};
-            CSR_CLAIM_COMPLETE_HART1_M:     read_machine = {5'b00000, interrupt_claim_cxt2};
-            CSR_CLAIM_COMPLETE_HART1_S:     read_machine = {5'b00000, interrupt_claim_cxt3};
+            //CSR_CLAIM_COMPLETE_HART1_M:     read_machine = {5'b00000, interrupt_claim_cxt2};
+            //CSR_CLAIM_COMPLETE_HART1_S:     read_machine = {5'b00000, interrupt_claim_cxt3};
             default:                        read_machine = 8'h00;
         endcase
     end
@@ -284,16 +284,16 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
                 CSR_INTERRUPT_PRIORITY_7:       source7_priority <= working_data[0];
                 CSR_INTERRUPT_ENABLE_HART0_M:   ie_m_mode_hart_0 <= working_data[7:1];
                 CSR_INTERRUPT_ENABLE_HART0_S:   ie_s_mode_hart_0 <= working_data[7:1];
-                CSR_INTERRUPT_ENABLE_HART1_M:   ie_m_mode_hart_1 <= working_data[7:1];
-                CSR_INTERRUPT_ENABLE_HART1_S:   ie_s_mode_hart_1 <= working_data[7:1];
+                //CSR_INTERRUPT_ENABLE_HART1_M:   ie_m_mode_hart_1 <= working_data[7:1];
+                //CSR_INTERRUPT_ENABLE_HART1_S:   ie_s_mode_hart_1 <= working_data[7:1];
                 CSR_PRIORITY_THRESHOLD_HART0_M: priority_threshold_m_mode_hart_0 <= working_data[0];
                 CSR_PRIORITY_THRESHOLD_HART0_S: priority_threshold_s_mode_hart_0 <= working_data[0];
-                CSR_PRIORITY_THRESHOLD_HART1_M: priority_threshold_m_mode_hart_1 <= working_data[0];
-                CSR_PRIORITY_THRESHOLD_HART1_S: priority_threshold_s_mode_hart_1 <= working_data[0];
+                //CSR_PRIORITY_THRESHOLD_HART1_M: priority_threshold_m_mode_hart_1 <= working_data[0];
+                //CSR_PRIORITY_THRESHOLD_HART1_S: priority_threshold_s_mode_hart_1 <= working_data[0];
                 CSR_CLAIM_COMPLETE_HART0_M:     claimed_bm_cxt0 <= decode==claimed_bm_cxt0 ? 8'h00 : claimed_bm_cxt0;
                 CSR_CLAIM_COMPLETE_HART0_S:     claimed_bm_cxt1 <= decode==claimed_bm_cxt1 ? 8'h00 : claimed_bm_cxt1;
-                CSR_CLAIM_COMPLETE_HART1_M:     claimed_bm_cxt2 <= decode==claimed_bm_cxt2 ? 8'h00 : claimed_bm_cxt2;
-                CSR_CLAIM_COMPLETE_HART1_S:     claimed_bm_cxt3 <= decode==claimed_bm_cxt3 ? 8'h00 : claimed_bm_cxt3;
+                //CSR_CLAIM_COMPLETE_HART1_M:     claimed_bm_cxt2 <= decode==claimed_bm_cxt2 ? 8'h00 : claimed_bm_cxt2;
+                //CSR_CLAIM_COMPLETE_HART1_S:     claimed_bm_cxt3 <= decode==claimed_bm_cxt3 ? 8'h00 : claimed_bm_cxt3;
             endcase
         end
     end
