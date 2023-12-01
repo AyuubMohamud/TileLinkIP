@@ -53,18 +53,23 @@ module openPolarisDMA
     input   wire logic [NoC-1:0]            sd_valid,
     output  wire logic [NoC-1:0]            sd_ready,
 
-    output  wire logic [(NoC*2)-1:0]        irq_o
+    output  wire logic [(NoC*2)-1:0]        irq_cmp_o,
+    output  wire logic [(NoC*2)-1:0]        irq_err_o
 );
     //! Configurable multi-channel DMA controller
     //! Address calculation: every 0x80 lies a new channel
-    //! DMACTRL = DMA_BASE + (0x80*CNO) + 0x0
-    //! DMANEXTSRC = DMA_BASE + (0x80*CNO) + 0x4
+    //! DMACTRL = DMA_BASE + (0x80*CNO) + 0x00
+    //! DMANEXTSRC = DMA_BASE + (0x80*CNO) + 0x04
     //! DMANEXTDEST = DMA_BASE + (0x80*CNO) + 0x0C
     //! DMANEXTSIZE = DMA_BASE + (0x80*CNO) + 0x14
     //! DMACURRSRC = DMA_BASE + (0x80*CNO) + 0x1C
     //! DMACURRDEST = DMA_BASE + (0x80*CNO) + 0x24
     //! DMACURRSIZE = DMA_BASE + (0x80*CNO) + 0x2C
 
+    reg [31:0] dmactrl [0:NoC-1];
+    
 
+
+    
 
 endmodule
