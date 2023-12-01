@@ -78,7 +78,7 @@ module openPolarisDMA
         dma_a_source, dma_a_size, dma_a_data, dma_a_mask, dma_a_opcode, dma_a_address
     }, dma_a_valid);
 
-    reg [3:0] dmactrl [0:NoC-1];
+    reg [3:0] dmactrl [0:NoC-1]; // IE, IP, RXS, TXS
     reg [31:0] dmasrc [0:NoC-1];
     reg [31:0] dmadest [0:NoC-1];
     reg [31:0] dmasize [0:NoC-1];
@@ -98,6 +98,19 @@ module openPolarisDMA
         assign sa_source[TL_RS*(i+1)-1:TL_RS*i] = 0;
     end
 
-    
+    always_ff @(posedge dma_clock_i) begin
+        if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h04)&(working_opcode==3'd0)) begin
+            dmasrc[referenced_core] <= working_data;
+        end
+        if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h08)&(working_opcode==3'd0)) begin
+            dmadest[referenced_core] <= working_data;
+        end
+        if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h0C)&(working_opcode==3'd0)) begin
+            dmasize[referenced_core] <= working_data;
+        end
+        if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]==8'h00)&(working_opcode==3'd0)) begin
+            
+        end
+    end
 
 endmodule
