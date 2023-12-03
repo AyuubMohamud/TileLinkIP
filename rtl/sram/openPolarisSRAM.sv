@@ -1,6 +1,6 @@
 module openPolarisSRAM #(
     parameter TL_RS = 4,
-    parameter TL_AW = 4
+    parameter TL_AW = 16
     ) (
     input   wire logic                          sram_clock_i,
     input   wire logic                          sram_reset_i,
@@ -80,7 +80,7 @@ module openPolarisSRAM #(
 
     reg [11:0] burst_counters;
     logic [11:0] number_to_write;
-    reg [11:0] addresser;
+    reg [TL_AW-3:0] addresser;
     initial addresser = 0;
     initial burst_counters = 0;
     always_comb begin
@@ -152,7 +152,7 @@ module openPolarisSRAM #(
                     burst_counters <= burst_counters - 1'b1;
                     addresser <= addresser + 1'b1;
                 end else begin
-                    addresser <= 12'd0;
+                    addresser <= 'd0;
                     burst <= 1'b0;
                     read <= 1'b0;
                     write <= 1'b0;
@@ -208,7 +208,7 @@ module openPolarisSRAM #(
             end
         endcase
     end
-    wire [TL_AW-3:0] sram_address = reset ? counter : read ? read_addresser+addresser[(TL_AW<13 ? TL_AW-3 : 11) : 0] : burst ? working_address[TL_AW-1:2]+addresser[(TL_AW<13 ? TL_AW-3 : 11) : 0] : working_address[TL_AW-1:2];
+    wire [TL_AW-3:0] sram_address = reset ? counter : read ? read_addresser+addresser[TL_AW-3 : 0] : burst ? working_address[TL_AW-1:2]+addresser[TL_AW-3 : 0] : working_address[TL_AW-1:2];
     wire [31:0] sram_data = reset ? 32'h00000000 : pause ? atomic : working_size>= 2 ? working_data:
     working_size==1 ? (
         working_address[1] ? {working_data[15:0], 16'h0000} : {16'h0000, working_data[15:0]} 
