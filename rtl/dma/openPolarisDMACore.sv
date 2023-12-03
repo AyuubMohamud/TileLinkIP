@@ -8,8 +8,6 @@ module openPolarisDMACore #(
     input   wire logic [TL_AW-1:0]              dmac_source_address_i,
     input   wire logic [TL_AW-1:0]              dmac_dest_address_i,
     input   wire logic [TL_AW-1:0]              dmac_bytes_tx_i,
-    input   wire logic                          dmac_stationary_rd_i,
-    input   wire logic                          dmac_stationary_wr_i,
     output  wire logic                          dmac_busy_o,
     output       logic                          dmac_done_o,
     output       logic                          dmac_err_o,
@@ -42,7 +40,7 @@ module openPolarisDMACore #(
     wire [31:0] read_data;
     wire empty;
     sfifo #(.DW(32), .FW(32)) fifo (dmac_clock_i, dmac_reset_i, write_fifo, dma_d_data, full, read_fifo, read_data, empty);
-
+    // Notably DMAable regions of memory support the kinds of accesses supported by tilelink
     reg [TL_AW-1:0] current_source_address;
     reg [TL_AW-1:0] current_destination_address;
 
@@ -161,8 +159,6 @@ module openPolarisDMACore #(
     reg [7:0] byte_count;
     reg [7:0] count_store;
     reg [3:0] size_store;
-    reg [5:0] ack_store;
-    reg [5:0] count_ack;
     assign read_fifo = dma_a_ready && (byte_count!=count_store);
     always_ff @(posedge dmac_clock_i) begin
         case (dma_state)
@@ -185,7 +181,7 @@ module openPolarisDMACore #(
                     dma_a_size <= minimum;
                     dma_a_valid <= 1;
                     dma_state <= DMA_AWAIT;
-                    current_source_address <= dmac_stationary_rd_i ? current_source_address : current_source_address + minimum_bytes;
+                    current_source_address <= current_source_address + minimum_bytes;
                     bytesRemaining <= bytesRemaining - minimum_bytes;
                     byte_count <= 0;
                     count_store <= minimum_bytes[7:0];
@@ -201,7 +197,6 @@ module openPolarisDMACore #(
                 if (byte_count == count_store) begin
                     dma_state <= DMA_WRITE;
                     byte_count <= 0;
-                    ack_store <= count_store[7:2] + {4'h0, |count_store[1:0]};
                 end else if (dma_d_ready&dma_d_valid) begin
                     byte_count <= byte_count + (dma_a_size >= 2 ? 4 : dma_a_size == 1 ? 2 : 1);
                 end
@@ -217,17 +212,12 @@ module openPolarisDMACore #(
                     dma_a_size <= size_store;
                     dma_a_valid <= 1;
                     byte_count <= byte_count + (dma_a_size >= 2 ? 4 : dma_a_size == 1 ? 2 : 1);
-                    current_destination_address <= dmac_stationary_wr_i ? current_destination_address : (size_store >= 2 ? 4 : size_store == 1 ? 2 : 1);
                 end
                 else if (byte_count==count_store) begin
-                    if (count_ack==ack_store) begin
+                    if (dma_d_ready&dma_d_valid&(dma_d_opcode==0)) begin
                         dma_state <= DMA_READ;
-                        count_ack <= 0;
                     end
                     dma_a_valid <= 0;
-                end
-                if (dma_d_valid&dma_d_ready&(dma_d_opcode==0)) begin
-                    count_ack <= count_ack + 1;
                 end
             end
         endcase

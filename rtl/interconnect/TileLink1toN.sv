@@ -156,7 +156,7 @@ module TileLink1toN #(
     logic resp_corrupt;
     reg [11:0] burst_counters;
     logic once;
-    wire burst = once&master_d_ready&(resp_size>{$clog2((TL_DW)/8)})|lock;
+    wire burst = once&master_d_ready&(resp_size>{$clog2((TL_DW)/8)})&(resp_opcode==1)|lock; // bursts are from the slave
     wire burst_ending = burst_counters==0 && lock && once;
     logic [$clog2(N)-1:0] bitscan;
     logic twoormore;
@@ -186,16 +186,16 @@ module TileLink1toN #(
     end
     for (genvar i = 0; i < N; i++) begin : blockLogic
         always_ff @(posedge tilelink_clock_i) begin
-            block[i] <= tilelink_reset_i ? 1'b0 : lock&!burst_ending ? block[i] : twoormore ? (i[$clog2(N)-1:0]==bitscan) : 1'b0;
+            block[i] <= tilelink_reset_i ? 1'b0 : lock ? block[i] : twoormore ? (i[$clog2(N)-1:0]==bitscan) : 1'b0;
         end
     end
     logic [11:0] number_to_write;
     always_ff @(posedge tilelink_clock_i) begin
-        lock <= tilelink_reset_i ? 1'b0 : lock ? !burst_ending : once&master_d_ready&(resp_size>{$clog2(TL_DW/8)});
+        lock <= tilelink_reset_i ? 1'b0 : lock ? !burst_ending : once&master_d_ready&(resp_size>{$clog2(TL_DW/8)})&(resp_opcode==1);
         for (integer x = 0; x < N; x++) begin
             locked_slave_select[x] <= tilelink_reset_i ? 1'b0 : locked_slave_select[x] ? !burst_ending : x[$clog2(N)-1:0]==bitscan && once && burst;
         end
-        burst_counters <= lock ? burst_ending ? 12'h000 : once ? burst_counters - 1'b1 : burst_counters : once&&master_d_ready&&(resp_size>{$clog2(TL_DW/8)}) ? number_to_write : 12'h000;
+        burst_counters <= lock ? burst_ending ? 12'h000 : once ? burst_counters - 1'b1 : burst_counters : once&&master_d_ready&&(resp_size>{$clog2(TL_DW/8)})&&(resp_opcode==1) ? number_to_write : 12'h000;
     end
     always_comb begin
         case (resp_size)

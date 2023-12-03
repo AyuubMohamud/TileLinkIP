@@ -50,7 +50,8 @@ module openPolarisDMA
     input   wire logic [NoC-1:0]            sd_valid,
     output  wire logic [NoC-1:0]            sd_ready,
 
-    output  wire logic [(NoC*2)-1:0]        irq_cmp_o
+    output  wire logic [NoC-1:0]        irq_cmp_o,
+    output  wire logic [NoC-1:0]        irq_err_o
 );
     //! Configurable multi-channel DMA controller
     //! Address calculation: every 0x80 lies a new channel
@@ -77,8 +78,9 @@ module openPolarisDMA
     }, working_valid, dma_busy, {
         dma_a_source, dma_a_size, dma_a_data, dma_a_mask, dma_a_opcode, dma_a_address
     }, dma_a_valid);
+    assign dma_a_ready = ~dma_busy;
 
-    reg [3:0] dmactrl [0:NoC-1]; // IE, IP, RXS, TXS
+    reg [1:0] dmactrl [0:NoC-1]; // IE, IP, RXS, TXS
     reg [31:0] dmasrc [0:NoC-1];
     reg [31:0] dmadest [0:NoC-1];
     reg [31:0] dmasize [0:NoC-1];
@@ -89,7 +91,7 @@ module openPolarisDMA
     wire [NoC-1:0] err;
     for (genvar i = 0; i < NoC; i++) begin : generateDMACores
         openPolarisDMACore #(.TL_AW(32)) core (dma_clock_i, dma_reset_i, start[i], dmasrc[i],
-        dmadest[i], dmasize[i], dmactrl[i][0], dmactrl[i][1], busy[i], done[i], err[i],
+        dmadest[i], dmasize[i], busy[i], done[i], err[i],
         sa_opcode[3*(i+1)-1:3*i], sa_param[3*(i+1)-1:3*i], sa_size[4*(i+1)-1:4*i], sa_address[32*(i+1)-1:32*i], 
         sa_mask[4*(i+1)-1:4*i], sa_data[32*(i+1)-1:32*i], sa_corrupt[i], sa_valid[i], sa_ready[i],
         sd_opcode[3*(i+1)-1:3*i], sd_param[2*(i+1)-1:2*i], sd_size[4*(i+1)-1:4*i], 
@@ -108,9 +110,62 @@ module openPolarisDMA
         if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h0C)&(working_opcode==3'd0)) begin
             dmasize[referenced_core] <= working_data;
         end
-        if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]==8'h00)&(working_opcode==3'd0)) begin
-            
+        if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h00)&(working_opcode==3'd0)) begin
+            dmactrl[referenced_core][1] <= working_data[1];
         end
     end
+    for (genvar i = 0; i < NoC; i++) begin: produceDoneLogicandIntLogic
+        always_ff @(posedge dma_clock_i) begin
+            if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h00)&(working_opcode==3'd0)&(referenced_core==i)) begin
+                dmactrl[i][0] <= 0; 
+            end else begin
+                dmactrl[i][0] <= done[i];
+            end
+        end
+        assign irq_cmp_o[i] = dmactrl[i][1]&dmactrl[i][0];
+        assign irq_err_o[i] = err[i]&dmactrl[i][0];
+    end
+    for (genvar i = 0; i < NoC; i++) begin: generateStartCondition
+        assign start[i] = (referenced_core==i)&&dma_d_ready&&working_valid&&(working_opcode==3'd0)&&(working_address[$clog2('h80)-1:0]=='h10);
+    end
 
+    always_ff @(posedge dma_clock_i) begin
+        if (dma_reset_i) begin
+            dma_d_valid <= 0;
+        end else if (working_valid&dma_d_ready) begin
+            dma_d_valid <= 1;
+            dma_d_source <= working_source;
+            dma_d_size <= working_size;
+            dma_d_corrupt <= 0;
+            dma_d_opcode <= {2'b00, (working_opcode==3'd4)};
+            dma_d_param <= 0;
+            case (working_address[$clog2('h80)-1:0])
+                'h00: begin
+                    dma_d_data <= {28'h0, busy[referenced_core], err[referenced_core], dmactrl[referenced_core]};
+                    dma_d_denied <= 1'b0;
+                end
+                'h04: begin
+                    dma_d_data <= dmasrc[referenced_core];
+                    dma_d_denied <= 1'b0;
+                end
+                'h08: begin
+                    dma_d_data <= dmadest[referenced_core];
+                    dma_d_denied <= 1'b0;
+                end
+                'h0C: begin
+                    dma_d_data <= dmasize[referenced_core];
+                    dma_d_denied <= 1'b0;
+                end
+                'h10: begin
+                    dma_d_data <= {31'h0, busy[referenced_core]};
+                    dma_d_denied <= 1'b0;
+                end
+                default: begin
+                    dma_d_denied <= 1;
+                end
+            endcase
+        end else if (!working_valid&dma_d_ready) begin
+            dma_d_valid <= 0;
+        end
+    end
 endmodule
