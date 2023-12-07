@@ -1,6 +1,8 @@
 module openPolarisSRAM #(
     parameter TL_RS = 4,
-    parameter TL_AW = 16
+    parameter TL_AW = 16,
+    parameter LOADINITIAL = 1,
+    parameter LOADFILE = "rom.bin"
     ) (
     input   wire logic                          sram_clock_i,
     input   wire logic                          sram_reset_i,
@@ -30,6 +32,12 @@ module openPolarisSRAM #(
     input   wire logic                          sram_d_ready
 );
     reg [31:0] sram [0:2**(TL_AW-2)-1];
+    generate if (LOADINITIAL) begin : loadROMfile
+        initial begin
+            $readmemb(LOADFILE, sram);
+        end
+    end
+    endgenerate
     reg reset;
     initial reset = 0;
     reg pause;
