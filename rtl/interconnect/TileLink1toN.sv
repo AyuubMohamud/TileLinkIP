@@ -136,7 +136,7 @@ module TileLink1toN #(
     for (genvar i = 0; i < N; i++) begin : gen0
         skdbf #(.DW(3+2+TL_SZ+TL_DW+TL_RS+1+1)) slave_skidbuffers (tilelink_clock_i, tilelink_reset_i, slaveResponseStalled[i], {working_slave_d_opcode[i], working_slave_d_param[i], working_slave_d_size[i], working_slave_d_source[i],
         working_slave_d_denied[i], working_slave_d_data[i], working_slave_d_corrupt[i]}, working_slave_d_valid[i], working_slave_d_busy[i], {
-            slave_d_opcode[((i+1)*3)-1:(i)*3], slave_d_param[((i+1)*2)-1:(i)*2], slave_d_size[((i+1)*TL_RS)-1:(i)*TL_RS], slave_d_source[((i+1)*TL_RS)-1:(i)*TL_RS], slave_d_denied[i], slave_d_data[((i+1)*TL_DW)-1:(i)*TL_DW], slave_d_corrupt[i]
+            slave_d_opcode[((i+1)*3)-1:(i)*3], slave_d_param[((i+1)*2)-1:(i)*2], slave_d_size[((i+1)*TL_SZ)-1:(i)*TL_SZ], slave_d_source[((i+1)*TL_RS)-1:(i)*TL_RS], slave_d_denied[i], slave_d_data[((i+1)*TL_DW)-1:(i)*TL_DW], slave_d_corrupt[i]
         }, slave_d_valid[i]);
     end
     for (genvar i = 0; i < N; i++) begin : gen1
@@ -160,27 +160,27 @@ module TileLink1toN #(
     wire burst_ending = burst_counters==0 && lock && once;
     logic [$clog2(N)-1:0] bitscan;
     logic twoormore;
-    logic Break;
+    logic FINISHSEL;
     always_comb begin
         bitscan = 'x;
         once = 0;    
-        Break = 0;
+        FINISHSEL = 0;
         for (integer n = 0; n < N; n++) begin
-            if (working_slave_d_valid[n]&master_d_ready&(lock ? locked_slave_select[n] : ~block[n])&!Break) begin
+            if (working_slave_d_valid[n]&master_d_ready&(lock ? locked_slave_select[n] : ~block[n])&!FINISHSEL) begin
                 bitscan = n[$clog2(N)-1:0];
                 once = 1'b1;
-                Break = 1;
+                FINISHSEL = 1;
             end
         end
     end
-    logic Break2;
+    logic FINISHSEL2;
     always_comb begin
         twoormore = 0;
-        Break2 = 0;
+        FINISHSEL2 = 0;
         for (integer n = 0; n < N; n++) begin
-            if (working_slave_d_valid[n]&&(n[$clog2(N)-1:0]!=bitscan)&&once&master_d_ready&!Break2) begin
+            if (working_slave_d_valid[n]&&(n[$clog2(N)-1:0]!=bitscan)&&once&master_d_ready&!FINISHSEL2) begin
                 twoormore = 1'b1;
-                Break2 = 1'b1;
+                FINISHSEL2 = 1'b1;
             end
         end
     end

@@ -7,11 +7,11 @@ module TileLinkMtoN #(
     parameter TL_AW = 32,
     parameter TL_RS = 4,
     parameter TL_SZ = 4,
-    parameter [(32*N)-1:0] slave_addresses = {
+    parameter [(TL_AW*N)-1:0] slave_addresses = {
         32'h00001000,
         32'h00002000
     }, //! Base addresses of mentioned slaves
-    parameter [(32*N)-1:0] slave_end_addresses = {
+    parameter [(TL_AW*N)-1:0] slave_end_addresses = {
         32'h00002000,
         32'h10000000
     }
@@ -81,8 +81,8 @@ module TileLinkMtoN #(
     wire [N-1:0]                  interconnect_slave_d_valid[0:M-1];
     wire [N-1:0]                  interconnect_slave_d_ready[0:M-1];
     for (genvar i = 0; i < M; i++) begin : generate1toNLinks
-        TileLink1toN #(.N(N), .slave_addresses(slave_addresses), .slave_end_addresses(slave_end_addresses),
-        TL_DW,TL_AW, TL_RS, TL_SZ) tilelink1toN (tilelink_clock_i, tilelink_reset_i,
+        TileLink1toN #(N, slave_addresses, slave_end_addresses,
+        TL_DW,TL_AW,TL_RS, TL_SZ) tilelink1toN (tilelink_clock_i, tilelink_reset_i,
             master_a_opcode[3*(i+1)-1:3*i], master_a_param[3*(i+1)-1:3*i], master_a_size[TL_SZ*(i+1)-1:TL_SZ*i],
             master_a_source[TL_RS*(i+1)-1:TL_RS*i], master_a_address[TL_AW*(i+1)-1:TL_AW*i], master_a_mask[(TL_DW/8)*(i+1)-1:(TL_DW/8)*i],
             master_a_data[TL_DW*(i+1)-1:TL_DW*i], master_a_corrupt[i], master_a_valid[i], master_a_ready[i], master_d_opcode[3*(i+1)-1:3*i], 
@@ -91,8 +91,7 @@ module TileLinkMtoN #(
             interconnect_slave_a_opcode[i], interconnect_slave_a_param[i], interconnect_slave_a_size[i], interconnect_slave_a_source[i],
             interconnect_slave_a_address[i], interconnect_slave_a_mask[i], interconnect_slave_a_data[i], interconnect_slave_a_corrupt[i], interconnect_slave_a_valid[i], interconnect_slave_a_ready[i],
             interconnect_slave_d_opcode[i], interconnect_slave_d_param[i], interconnect_slave_d_size[i], interconnect_slave_d_source[i], interconnect_slave_d_denied[i], interconnect_slave_d_data[i],
-            interconnect_slave_d_corrupt[i], interconnect_slave_d_valid[i], interconnect_slave_d_ready[i]
-        );
+            interconnect_slave_d_corrupt[i], interconnect_slave_d_valid[i], interconnect_slave_d_ready[i]);
     end
 
     // Now we have generated 1 to N links, we must transform them and turn them into M to 1 links
@@ -139,7 +138,7 @@ module TileLinkMtoN #(
         end
     end
     for (genvar i = 0; i < N; i++) begin : generateMto1Links
-        TileLinkMto1 #(.M(M), TL_DW, TL_AW, TL_RS, TL_SZ) tilelinkMto1 (
+        TileLinkMto1 #(M, TL_DW, TL_AW, TL_RS, TL_SZ) tilelinkMto1 (
             tilelink_clock_i, tilelink_reset_i, 
             interconnect_master_a_opcode[i],
             interconnect_master_a_param[i],

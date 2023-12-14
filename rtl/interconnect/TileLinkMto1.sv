@@ -124,7 +124,7 @@ module TileLinkMto1 #(
     for (genvar i = 0; i < M; i++) begin : gen0
         skdbf #(.DW(3+2+TL_SZ+TL_DW+TL_RS+1+TL_DW/8+TL_AW+1)) master_skidbuffers (tilelink_clock_i, tilelink_reset_i, masterRequestStalled[i], {working_master_a_opcode[i], working_master_a_param[i], working_master_a_size[i], working_master_a_source[i],
         working_master_a_mask[i], working_master_a_data[i], working_master_a_address[i], working_master_a_corrupt[i]}, working_master_a_valid[i], working_master_a_busy[i], {
-            master_a_opcode[((i+1)*3)-1:(i)*3], master_a_param[((i+1)*3)-1:(i)*3], master_a_size[((i+1)*TL_RS)-1:(i)*TL_RS], master_a_source[((i+1)*TL_RS)-1:(i)*TL_RS], master_a_mask[((i+1)*TL_DW/8)-1:(i)*TL_DW/8], master_a_data[((i+1)*TL_DW)-1:(i)*TL_DW], master_a_address[((i+1)*TL_AW)-1:(i)*TL_AW], master_a_corrupt[i]
+            master_a_opcode[((i+1)*3)-1:(i)*3], master_a_param[((i+1)*3)-1:(i)*3], master_a_size[((i+1)*TL_SZ)-1:(i)*TL_SZ], master_a_source[((i+1)*TL_RS)-1:(i)*TL_RS], master_a_mask[((i+1)*TL_DW/8)-1:(i)*TL_DW/8], master_a_data[((i+1)*TL_DW)-1:(i)*TL_DW], master_a_address[((i+1)*TL_AW)-1:(i)*TL_AW], master_a_corrupt[i]
         }, master_a_valid[i]);
     end
     for (genvar i = 0; i < M; i++) begin : gen1
