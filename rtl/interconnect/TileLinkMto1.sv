@@ -167,7 +167,7 @@ module TileLinkMto1 #(
         twoormore = 0;
         Break2 = 0;
         for (integer n = 0; n < M; n++) begin
-            if (working_master_a_valid[M]&&(n[$clog2(M)-1:0]!=bitscan)&&once&slave_a_ready&!Break2) begin
+            if (working_master_a_valid[n]&&(n[$clog2(M)-1:0]!=bitscan)&&once&slave_a_ready&!Break2) begin
                 twoormore = 1'b1;
                 Break2 = 1'b1;
             end

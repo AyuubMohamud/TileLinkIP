@@ -1,7 +1,5 @@
 // Copyright (C) Ayuub Mohamud, 2023
 // Licensed under CERN-OHL-W version 2
-`include "clint_defines.sv"
-
 module openPolarisCLINT #(parameter HARTNO = 1,
     parameter TL_RS = 4
     ) (
@@ -99,10 +97,10 @@ module openPolarisCLINT #(parameter HARTNO = 1,
     logic [31:0] write_value_machine;
     always_comb begin
         case (working_opcode)
-            tluh::PutFullData:   begin
+            3'd0:   begin
                 write_value_machine = working_data;
             end
-            tluh::LogicalData:   begin
+            3'd3:   begin
                 if (working_param==3'd0) begin
                     write_value_machine = read_machine^working_data;
                 end else if (working_param==3'd1) begin
