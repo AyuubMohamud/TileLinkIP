@@ -283,7 +283,7 @@ module openPolarisSRAM #(
             data_o <= sram[sram_address];
             subbyte <= working_address[1:0];
             two_byte <= working_size == 4'd1;
-            source <= (working_size > 4'd1);
+            source <= read ? 1'b1 : (working_size > 4'd1);
         end
         else if (!(~sram_d_ready|reset)&write_respond) begin
             sram_d_corrupt <= 1'b0;
