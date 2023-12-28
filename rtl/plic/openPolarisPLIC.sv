@@ -63,7 +63,7 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
         if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:12]==10'd2)) begin
             int_enable[working_address[8:7]] <= working_data&32'hFFFFFFFE;
         end
-        if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:16]==6'b100000)) begin
+        if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:16]==6'b100000)&(!working_address[2])) begin
             priority_threshold[working_address[13:12]] <= working_data[0];
         end
     end
