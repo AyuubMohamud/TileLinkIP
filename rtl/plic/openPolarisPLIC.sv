@@ -58,7 +58,7 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
     reg priority_threshold [0:3];
     always_ff @(posedge plic_clock_i) begin
         if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:12]==0)) begin
-            source_priority <= working_data&32'hFFFFFFFE;
+            source_priority[working_address[6:2]] <= working_address[6:2] == 0 ? 0 : working_data[0];
         end
         if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:12]==10'd2)) begin
             int_enable[working_address[8:7]] <= working_data&32'hFFFFFFFE;
@@ -180,7 +180,7 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
     end
 
     for (genvar i = 0; i < 4; i++) begin : generateLevelInterrupts
-        assign int_o[i] = |({32{priority_threshold[i]}}&(interrupt_pending&~claim_block[0]&~claim_block[1]&~claim_block[2]&~claim_block[3])&int_enable[i]&source_priority);
+        assign int_o[i] = |({32{priority_threshold[i]}}&(interrupt_pending)&int_enable[i]&source_priority&~claim_block[0]&~claim_block[1]&~claim_block[2]&~claim_block[3]);
     end
 
 endmodule
