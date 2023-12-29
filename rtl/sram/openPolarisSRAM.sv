@@ -227,16 +227,16 @@ module openPolarisSRAM #(
         {working_data[7:0], 24'h000000}
     );
     wire [3:0] wr_enable = {
-        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[3]&(
+        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[3]&!read&(
             working_size>=2 || working_size>=1&working_address[1] || working_address[1:0]==2'b11
         ))&sram_d_ready),
-        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[2]&(
+        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[2]&!read&(
             working_size>=2 || working_size>=1&working_address[1] || working_address[1:0]==2'b10
         ))&sram_d_ready),
-        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[1]&(
+        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[1]&!read&(
             working_size>=2 || working_size>=1&!working_address[1] || working_address[1:0]==2'b01
         ))&sram_d_ready),
-        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[0]&(
+        (reset)|((pause||working_valid&(working_opcode==PutFullData||working_opcode==PutPartialData)&working_mask[0]&!read&(
             working_size>=2 || working_size>=1&!working_address[1] || working_address[1:0]==2'b00
         ))&sram_d_ready)
     };
