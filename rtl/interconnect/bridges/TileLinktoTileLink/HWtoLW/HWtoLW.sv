@@ -31,6 +31,7 @@ module HWtoLW #(parameter TL_RS = 4, parameter TL_AW = 28) (
     output       logic [TL_AW-1:0]              lw_a_address,
     output       logic [3:0]                    lw_a_mask,
     output       logic [31:0]                   lw_a_data,
+    output       logic [TL_RS-1:0]              lw_a_source,
     output       logic                          lw_a_corrupt,
     output       logic                          lw_a_valid,
     input   wire logic                          lw_a_ready,
@@ -62,11 +63,6 @@ module HWtoLW #(parameter TL_RS = 4, parameter TL_AW = 28) (
     reg [11:0] read_burst_counter;
     reg read_burst;
     wire lw_busy = read_burst|~lw_a_ready;
-    reg write_burst;
-    reg [11:0] write_ack_combine;
-    reg write_ack;
-    reg [3:0] size;
-    reg [TL_RS-1:0] source;
     reg [TL_AW-1:0] addresser;
     assign hw_a_ready = ~bridge_busy;
     skdbf #(TL_RS+4+42+TL_AW) skidbuffer (tilelink_clock_i, tilelink_reset_i, lw_busy|read_burst, {
@@ -139,33 +135,19 @@ module HWtoLW #(parameter TL_RS = 4, parameter TL_AW = 28) (
             read_burst_counter <= read_burst_counter==0 ? 0 : read_burst_counter-1;
             read_burst <= read_burst_counter!=0;
         end
-        else if (lw_a_ready&(write_burst)&working_valid) begin
-            // use read counter differently here
-            lw_a_valid <= 1;
-            lw_a_address <= current_address;
-            lw_a_corrupt <= 0;
-            lw_a_opcode <= 3'd0;
-            lw_a_param <= 0;
-            lw_a_size <= 4'd2;
-            lw_a_data <= working_data;
-            read_burst_counter <= read_burst_counter==0 ? 0 : read_burst_counter-1;
-            write_burst <= read_burst_counter!=0;
-        end
         else if (lw_a_ready&(working_valid)) begin
             lw_a_valid <= 1;
-            lw_a_address <= read_burst|write_burst ? current_address : working_address;
+            lw_a_address <= read_burst ? current_address : working_address;
             lw_a_corrupt <= 0;
             lw_a_opcode <= working_opcode;
             lw_a_data <= working_data;
             lw_a_mask <= working_mask;
             lw_a_param <= working_param;
             lw_a_size <= working_size > 4'd2 ? 4'd2 : working_size;
+            lw_a_source <= working_source;
             read_burst <= (working_opcode==4)&&(working_size>4'd2);
-            write_burst <= (working_opcode==1||working_opcode==0)&&(working_size>4'd2);
-            addresser <= (write_burst) ? current_address : working_address;
+            addresser <= working_address;
             read_burst_counter <= number_to_write;
-            size <= working_size;
-            source <= working_source;
         end else if (lw_a_ready&!(working_valid|read_burst)) begin
             lw_a_valid <= 0;
         end
@@ -179,21 +161,9 @@ module HWtoLW #(parameter TL_RS = 4, parameter TL_AW = 28) (
     wire lw_working_valid;
     wire hw_busy = ~hw_d_ready;
     wire hw_bridge_busy;
-    always_ff @(posedge tilelink_clock_i) begin
-        if (write_ack&hw_d_ready) begin
-            write_ack <= 0;
-        end else if (lw_a_ready&~write_burst&working_valid) begin
-            write_ack_combine <= (working_opcode==1||working_opcode==0)&&(working_size>4'd2) ?
-            number_to_write : 0;
-        end
-        else if (~hw_busy && lw_working_valid && (lw_working_opcode==0||lw_working_opcode==1)) begin
-            write_ack <= write_ack_combine==0;
-            write_ack_combine <= write_ack_combine==0 ? 0 : write_ack_combine - 1;
-        end 
-    end
 
     assign lw_d_ready = ~hw_bridge_busy;
-    skdbf #(TL_RS+4+37) skidbuffer2 (tilelink_clock_i, tilelink_reset_i, hw_busy|write_ack, {
+    skdbf #(TL_RS+4+37) skidbuffer2 (tilelink_clock_i, tilelink_reset_i, hw_busy, {
         lw_working_source,
         lw_working_size,
         lw_working_data,
@@ -203,16 +173,16 @@ module HWtoLW #(parameter TL_RS = 4, parameter TL_AW = 28) (
         lw_d_source, lw_d_size, lw_d_data, lw_d_opcode, lw_d_param
     }, lw_d_valid);
     always_ff @(posedge tilelink_clock_i) begin
-        if (hw_d_ready&(write_ack|(lw_working_valid&(lw_working_opcode==1)))) begin
+        if (hw_d_ready&((lw_working_valid))) begin
             hw_d_valid <= 1;
             hw_d_corrupt <= 0;
             hw_d_data <= lw_working_data;
-            hw_d_opcode <= write_ack ? 0 : lw_working_opcode;
+            hw_d_opcode <= lw_working_opcode;
             hw_d_param <= lw_working_param;
             hw_d_denied <= 0;
-            hw_d_size <= write_ack ? size : lw_working_size;
-            hw_d_source <= write_ack ? source : lw_working_source;
-        end else if (hw_d_ready&(~write_ack&~(lw_working_valid&(lw_working_opcode==1)))) begin
+            hw_d_size <= lw_working_size;
+            hw_d_source <= lw_working_source;
+        end else if (hw_d_ready&~(lw_working_valid)) begin
             hw_d_valid <= 0;
         end
     end 

@@ -84,16 +84,18 @@ module TileLinkToUI #(parameter TL_RS = 4, parameter TL_AW = 28) (
         if (tilelink_reset_i) begin
             app_en <= 0;
             awaiting_response <= 0;
-        end
+        end else if (app_en&app_rdy) begin
+            app_en <= 1'b0;
+            awaiting_response <= 1'b1;
+            app_wdf_wren <= app_wdf_rdy ? 0 : app_wdf_wren;
+            app_wdf_end <= app_wdf_rdy ? 0 : app_wdf_end;
+        end 
         else if ((app_rd_data_end&app_rd_data_valid)|(app_wdf_rdy&app_wdf_wren&app_wdf_end)) begin
             awaiting_response <= 1'b0;
             app_wdf_wren <= 0;
             app_wdf_end <= 0;
         end
-        else if (app_en&app_rdy) begin
-            app_en <= 1'b0;
-            awaiting_response <= 1'b1;
-        end else if (working_valid&!ddr3_busy&!awaiting_response) begin
+        else if (working_valid&!ddr3_busy&!awaiting_response) begin
             app_addr <= {working_address[27:4], 4'h0};
             low_order <= working_address[3:0];
             app_cmd <= {2'b00, working_opcode[2]};
@@ -102,7 +104,6 @@ module TileLinkToUI #(parameter TL_RS = 4, parameter TL_AW = 28) (
             app_wdf_end <= ~working_opcode[2];
             app_wdf_mask <= ~full_mask;
             app_wdf_data <= full_data;
-            app_wdf_end <= 1;
             source <= working_source;
             size <= working_size;
         end
