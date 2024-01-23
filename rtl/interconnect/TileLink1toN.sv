@@ -99,7 +99,7 @@ module TileLink1toN #(
     for (genvar x = 0; x < N; x++) begin : address_decode
         assign slave_select[x] = ((slave_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]<=working_master_a_address)&&(slave_end_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]>working_master_a_address)&working_master_a_valid);
     end
-    reg deny_service;
+
     assign master_stalled = |(slave_select&~slave_a_ready);
 
     for (genvar i = 0; i < N; i++) begin : slaveRequest
@@ -122,16 +122,7 @@ module TileLink1toN #(
             end
         end
     end
-    always_ff @(posedge tilelink_clock_i) begin
-        if (tilelink_reset_i) begin
-            deny_service <= 0;
-        end
-        else if (working_master_a_valid&!(|slave_select)&!deny_service) begin
-            deny_service <= 1;
-        end else if (working_master_a_valid&deny_service&master_d_ready) begin
-            deny_service <= 0;
-        end
-    end
+
     wire [N-1:0]                slaveResponseStalled;
     wire [2:0]                  working_slave_d_opcode [N-1:0];
     wire [1:0]                  working_slave_d_param [N-1:0];
@@ -264,22 +255,12 @@ module TileLink1toN #(
     end
 
     for (genvar n = 0; n < N; n++) begin : stallLogic
-        assign slaveResponseStalled[n] = (!master_d_ready)|(twoormore&&(n[$clog2(N)-1:0]!=bitscan))|(!locked_slave_select[n]&lock)|deny_service;
+        assign slaveResponseStalled[n] = (!master_d_ready)|(twoormore&&(n[$clog2(N)-1:0]!=bitscan))|(!locked_slave_select[n]&lock);
     end
     always_ff @(posedge tilelink_clock_i) begin
         if (tilelink_reset_i) begin
             master_d_valid <= 1'b0;
         end 
-        else if (deny_service&master_d_ready) begin
-            master_d_valid <= 1'b1;
-            master_d_corrupt <= resp_corrupt;
-            master_d_data <= resp_data;
-            master_d_denied <= 1'b1;
-            master_d_opcode <= resp_opcode;
-            master_d_param <= resp_param;
-            master_d_size <= resp_size;
-            master_d_source <= resp_id;
-        end
         else if (once&master_d_ready) begin
             master_d_valid <= 1'b1;
             master_d_corrupt <= resp_corrupt;
