@@ -27,7 +27,7 @@ module TileLinkMtoAXI4S #(
     output       logic                          master_d_valid,
     input   wire logic                          master_d_ready,
 
-    output       logic [CIW-1:0]                axi_arid,
+    output       logic [0:0]                    axi_arid,
     output       logic [CAW-1:0]                axi_araddr,
     output       logic [7:0]                    axi_arlen,
     output       logic [2:0]                    axi_arsize,
@@ -38,14 +38,14 @@ module TileLinkMtoAXI4S #(
     output       logic                          axi_arvalid,
     input   wire logic                          axi_arready,
 
-    input   wire logic [CIW-1:0]                axi_rid,
+    input   wire logic [0:0]                    axi_rid,
     input   wire logic [CDW-1:0]                axi_rdata,
     input   wire logic [1:0]                    axi_rresp,
     input   wire logic                          axi_rlast,
     input   wire logic                          axi_rvalid,
     output       logic                          axi_rready,
 
-    output       logic [CIW-1:0]                axi_awid,
+    output       logic [0:0]                    axi_awid,
     output       logic [CAW-1:0]                axi_awaddr,
     output       logic [7:0]                    axi_awlen,
     output       logic [2:0]                    axi_awsize,
@@ -62,7 +62,7 @@ module TileLinkMtoAXI4S #(
     output       logic                          axi_wvalid,
     input   wire logic                          axi_wready,
 
-    input   wire logic [CIW-1:0]                axi_bid,
+    input   wire logic [0:0]                    axi_bid,
     input   wire logic [1:0]                    axi_bresp,
     input   wire logic                          axi_bvalid,
     output       logic                          axi_bready
@@ -85,29 +85,29 @@ module TileLinkMtoAXI4S #(
 
     logic [7:0] amount_to_push;
     always_comb begin
-        case (master_a_size)
-            4'd5: begin
+        case (working_master_a_size)
+            4'd3: begin
                 amount_to_push = 1;
             end
-            4'd6: begin
+            4'd4: begin
                 amount_to_push = 3;
-            end
-            4'd7: begin
+            end 
+            4'd5: begin
                 amount_to_push = 7;
             end
-            4'd8: begin
+            4'd6: begin
                 amount_to_push = 15;
             end
-            4'd9: begin
+            4'd7: begin
                 amount_to_push = 31;
             end
-            4'd10: begin
+            4'd8: begin
                 amount_to_push = 63;
             end
-            4'd11: begin
+            4'd9: begin
                 amount_to_push = 127;
             end
-            4'd12: begin
+            4'd10: begin
                 amount_to_push = 255;
             end
             default: begin
@@ -127,20 +127,31 @@ module TileLinkMtoAXI4S #(
     assign axi_bready = master_d_ready;
     assign axi_rready = master_d_ready;
     assign bridge_processing = (bridge_fsm!=3'b000)&&(bridge_fsm!=3'b010);
+    wire [3:0] mask = working_master_a_size==4'd0 ? {
+    working_master_a_address[1:0]==2'd3, working_master_a_address[1:0]==2'd2, working_master_a_address[1:0]==2'd1, working_master_a_address[1:0]==2'd0
+    } : working_master_a_size==4'd1 ? {
+        working_master_a_address[1:0]==2'b10, working_master_a_address[1:0]==2'b10, working_master_a_address[1:0]==2'b00, working_master_a_address[1:0]==2'b00
+    } : 4'b1111;
+    wire [31:0] data =  working_master_a_size==4'd0 ? {working_master_a_data[7:0], working_master_a_data[7:0], working_master_a_data[7:0], working_master_a_data[7:0]} :
+    working_master_a_size==4'd1 ? {working_master_a_data[15:0], working_master_a_data[15:0]} : working_master_a_data;
+    reg [1:0] low_order;
+    wire [31:0] data_tl = r_master_a_size==4'd0 ? low_order==2'b00 ? {24'h000000, axi_rdata[7:0]} : low_order==2'b01 ? {24'h000000,axi_rdata[15:8]} :
+    low_order==2'b10 ? {24'h000000,axi_rdata[23:16]} :{24'h000000,axi_rdata[31:24]} : r_master_a_size==4'd1 ? low_order[1] ? {16'h0000, axi_rdata[31:16]} :
+    {16'h0000, axi_rdata[15:0]} : axi_rdata;
     always_ff @(posedge axi_aclk) begin
         case (bridge_fsm)
             3'b000: begin
-                r_master_a_data <= working_master_a_data;
-                r_master_a_mask <= working_master_a_mask;
+                r_master_a_data <= data;
+                r_master_a_mask <= mask;
                 r_master_a_size <= working_master_a_size;
                 burst_counter <= amount_to_push;
                 r_master_a_source <= working_master_a_source;
                 if (working_master_a_valid&&(working_master_a_opcode==3'd0|working_master_a_opcode==3'd1)) begin
                     axi_awid <= 0;
-                    axi_awaddr <= working_master_a_address;
+                    axi_awaddr <= {working_master_a_address[CAW-1:2], 2'b00};
                     axi_awlen <= amount_to_push;
-                    axi_awsize <= 4;
-                    axi_awburst <= 2'b01;
+                    axi_awsize <= 3'b010;
+                    axi_awburst <=2'b01;
                     axi_awlock <= 0;
                     axi_awcache <= 0;
                     axi_awprot <= 0;
@@ -148,16 +159,18 @@ module TileLinkMtoAXI4S #(
                     bridge_fsm <= 3'b001;
                 end else if (working_master_a_valid&&(working_master_a_opcode==3'd4)) begin
                     axi_arid <= 0;
-                    axi_araddr <= working_master_a_address;
+                    axi_araddr <= {working_master_a_address[CAW-1:2], 2'b00};
                     axi_arlen <= amount_to_push;
-                    axi_arsize <= 4;
-                    axi_arburst <= 2'b01;
+                    axi_arsize <= 3'b010;
+                    axi_arburst <=2'b01;
                     axi_arlock <= 0;
                     axi_arcache <= 0;
                     axi_arprot <= 0;
                     axi_arvalid <= 1;
+                    low_order <= working_master_a_address[1:0];
                     bridge_fsm <= 3'b101;
                 end
+                master_d_valid <= master_d_ready ? 0 : master_d_valid;
             end
             3'b001: begin
                 if (write_request_accepted) begin
@@ -171,15 +184,15 @@ module TileLinkMtoAXI4S #(
             end
             3'b010: begin
                 axi_wvalid <= 1;
-                axi_wdata <= master_a_data;
-                axi_wstrb <= master_a_mask;
+                axi_wdata <= r_master_a_data;
+                axi_wstrb <= r_master_a_mask;
                 axi_wlast <= burst_counter == 0;
                 bridge_fsm <= 3'b011;
             end
             3'b011: begin
                 if (write_data_accepted) begin
                     axi_wvalid <= 0;
-                    if (amount_to_push==0) begin
+                    if (burst_counter==0) begin
                         bridge_fsm <= 3'b100;
                     end else begin
                         burst_counter <= burst_counter - 1'b1;
@@ -205,13 +218,15 @@ module TileLinkMtoAXI4S #(
             end
             3'b110: begin
                 if (axi_rready&&axi_rvalid&&(axi_rid==0)) begin
-                    master_d_data <= axi_rdata;
+                    master_d_data <= data_tl;
                     master_d_valid <= 1;
                     master_d_opcode <= 1;
                     master_d_size <= r_master_a_size;
                     master_d_source <= r_master_a_source;
                     master_d_denied <= axi_rresp != 0;
-                    bridge_fsm <= axi_rlast ? 3'b000 : 3'b101;
+                    bridge_fsm <= axi_rlast ? 3'b000 : 3'b110;
+                end else if (axi_rready&&!axi_rvalid) begin
+                    master_d_valid <= 0;
                 end
             end
             default: begin
