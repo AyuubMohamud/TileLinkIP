@@ -1,7 +1,8 @@
 module openPolarisDMA
 #(
     parameter NoC = 2, //! Number of channels to generate
-    parameter TL_RS = 4
+    parameter TL_RS = 4,
+    parameter TL_AW = 32
 )
 (
     input   wire logic                      dma_clock_i,
@@ -33,7 +34,7 @@ module openPolarisDMA
     output       logic [(3*NoC)-1:0]        sa_param ,
     output       logic [(4*NoC)-1:0]    sa_size ,
     output       logic [(TL_RS*NoC)-1:0]    sa_source ,
-    output       logic [(32*NoC)-1:0]    sa_address ,
+    output       logic [(TL_AW*NoC)-1:0]    sa_address ,
     output       logic [NoC*(4)-1:0] sa_mask ,
     output       logic [(32*NoC)-1:0] sa_data ,
     output       logic [NoC-1:0]            sa_corrupt ,
@@ -90,7 +91,7 @@ module openPolarisDMA
     wire [NoC-1:0] done;
     wire [NoC-1:0] err;
     for (genvar i = 0; i < NoC; i++) begin : generateDMACores
-        openPolarisDMACore #(.TL_AW(32)) core (dma_clock_i, dma_reset_i, start[i], dmasrc[i],
+        openPolarisDMACore #(.TL_AW(TL_AW)) core (dma_clock_i, dma_reset_i, start[i], dmasrc[i],
         dmadest[i], dmasize[i], busy[i], done[i], err[i],
         sa_opcode[3*(i+1)-1:3*i], sa_param[3*(i+1)-1:3*i], sa_size[4*(i+1)-1:4*i], sa_address[32*(i+1)-1:32*i], 
         sa_mask[4*(i+1)-1:4*i], sa_data[32*(i+1)-1:32*i], sa_corrupt[i], sa_valid[i], sa_ready[i],

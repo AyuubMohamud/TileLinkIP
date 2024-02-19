@@ -92,34 +92,10 @@ module openPolarisDMACore #(
     end
     logic [3:0] max_burst_size_from_remainder;
     logic [TL_AW-1:0] bytes_2;
-    always_comb begin
-        casez (bytesRemaining[6:0])
-            7'bzzzzzz1: begin
-                max_burst_size_from_remainder = 4'd0; bytes_2 = 1;
-            end
-            7'bzzzzz10: begin
-                max_burst_size_from_remainder = 4'd1; bytes_2 = 2;
-            end
-            7'bzzzz100: begin
-                max_burst_size_from_remainder = 4'd2; bytes_2 = 4;
-            end
-            7'bzzz1000: begin
-                max_burst_size_from_remainder = 4'd3; bytes_2 = 8;
-            end
-            7'bzz10000: begin
-                max_burst_size_from_remainder = 4'd4; bytes_2 = 16;
-            end
-            7'bz100000: begin
-                max_burst_size_from_remainder = 4'd5; bytes_2 = 32;
-            end
-            7'b1000000: begin
-                max_burst_size_from_remainder = 4'd6; bytes_2 = 64;
-            end
-            default: begin
-                max_burst_size_from_remainder = 4'd7; bytes_2 = 128;
-            end
-        endcase
-    end
+    assign max_burst_size_from_remainder = bytesRemaining==1 ? 4'd0 : bytesRemaining<4 ? 4'd1 : bytesRemaining<8 ? 4'd2 : bytesRemaining<16 ? 4'd3 : bytesRemaining<32 ?
+    4'd4 : bytesRemaining<64 ? 4'd5 : bytesRemaining<128 ? 4'd6 : 4'd7;
+    assign bytes_2 = bytesRemaining==1 ? 1 : bytesRemaining<4 ? 2 : bytesRemaining<8 ? 4 : bytesRemaining<16 ? 8 : bytesRemaining<32 ?
+    16 : bytesRemaining<64 ? 32 : bytesRemaining<128 ? 64 : 128;
     wire [3:0] min_stage1 = max_burst_size_from_dest_addr < max_burst_size_from_src_addr ? max_burst_size_from_dest_addr : max_burst_size_from_src_addr;
     wire [3:0] minimum = max_burst_size_from_remainder < min_stage1 ? max_burst_size_from_remainder : min_stage1;
     wire [TL_AW-1:0] min_stage1_bsize = max_burst_size_from_dest_addr < max_burst_size_from_src_addr ? bytes_0 : bytes_1;
@@ -132,6 +108,8 @@ module openPolarisDMACore #(
     always_ff @(posedge dmac_clock_i) begin
         case (dma_state)
             IDLE: begin
+                dmac_done_o <= 0;
+                dmac_err_o <= 0;
                 if (dmac_tx_i) begin
                     bytesRemaining <= dmac_bytes_tx_i;
                     current_source_address <= dmac_source_address_i;
@@ -166,8 +144,14 @@ module openPolarisDMACore #(
                 if (byte_count == count_store) begin
                     dma_state <= DMA_WRITE;
                     byte_count <= 0;
-                end else if (dma_d_ready&dma_d_valid) begin
+                end else if (dma_d_ready&dma_d_valid&(dma_d_opcode==1)) begin
                     byte_count <= byte_count + (dma_a_size >= 2 ? 4 : dma_a_size == 1 ? 2 : 1);
+                end else if (dma_d_ready&dma_d_valid&dma_d_denied) begin
+                    byte_count <= 0;
+                    current_destination_address <= 0;
+                    current_source_address <= 0;
+                    dmac_err_o <= 1;
+                    dma_state <= IDLE;
                 end
             end
             DMA_WRITE: begin
@@ -188,6 +172,10 @@ module openPolarisDMACore #(
                         current_destination_address <= current_destination_address + minimum_bytes_r;
                         bytesRemaining <= bytesRemaining - minimum_bytes_r;
                         dma_state <= DMA_READ;
+                    end else if (dma_d_ready&dma_d_valid&dma_d_denied) begin
+                        dma_state <= IDLE;
+                        dmac_err_o <= 1;
+                        dmac_done_o <= 1;
                     end
                     dma_a_valid <= dma_a_ready ? 0 : dma_a_valid;
                 end
