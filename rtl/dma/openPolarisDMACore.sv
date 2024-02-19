@@ -67,22 +67,6 @@ module openPolarisDMACore #(
                 max_burst_size_from_dest_addr = 4'd2;
                 bytes_0 = 4;
             end
-            7'bzzz1000: begin
-                max_burst_size_from_dest_addr = 4'd3;
-                bytes_0 = 8;
-            end
-            7'bzz10000: begin
-                max_burst_size_from_dest_addr = 4'd4;
-                bytes_0 = 16;
-            end
-            7'bz100000: begin
-                max_burst_size_from_dest_addr = 4'd5;
-                bytes_0 = 32;
-            end
-            7'b1000000: begin
-                max_burst_size_from_dest_addr = 4'd6;
-                bytes_0 = 64;
-            end
             default: begin
                 max_burst_size_from_dest_addr = 4'd7;
                 bytes_0 = 128;
@@ -100,22 +84,6 @@ module openPolarisDMACore #(
             7'bzzzzz10: begin
                 max_burst_size_from_src_addr = 4'd1;
                 bytes_1 = 2;
-            end
-            7'bzzzz100: begin
-                max_burst_size_from_src_addr = 4'd2;
-                bytes_1 = 4;
-            end
-            7'bzzz1000: begin
-                max_burst_size_from_src_addr = 4'd3; bytes_1 = 8;
-            end
-            7'bzz10000: begin
-                max_burst_size_from_src_addr = 4'd4; bytes_1 = 16;
-            end
-            7'bz100000: begin
-                max_burst_size_from_src_addr = 4'd5; bytes_1 = 32;
-            end
-            7'b1000000: begin
-                max_burst_size_from_src_addr = 4'd6; bytes_1 = 64;
             end
             default: begin
                 max_burst_size_from_src_addr = 4'd7; bytes_1 = 128;
@@ -159,6 +127,7 @@ module openPolarisDMACore #(
     reg [7:0] byte_count;
     reg [7:0] count_store;
     reg [3:0] size_store;
+    reg [31:0] minimum_bytes_r;
     assign read_fifo = dma_a_ready && (byte_count!=count_store);
     always_ff @(posedge dmac_clock_i) begin
         case (dma_state)
@@ -182,10 +151,10 @@ module openPolarisDMACore #(
                     dma_a_valid <= 1;
                     dma_state <= DMA_AWAIT;
                     current_source_address <= current_source_address + minimum_bytes;
-                    bytesRemaining <= bytesRemaining - minimum_bytes;
                     byte_count <= 0;
                     count_store <= minimum_bytes[7:0];
                     size_store <= minimum;
+                    minimum_bytes_r <= minimum_bytes;
                 end else if (bytesRemaining==0) begin
                     dmac_done_o <= 1;
                     dmac_err_o <= 0;
@@ -193,7 +162,7 @@ module openPolarisDMACore #(
                 end
             end
             DMA_AWAIT: begin
-                dma_a_valid <= 0;
+                dma_a_valid <= dma_a_ready ? 0 : dma_a_valid;
                 if (byte_count == count_store) begin
                     dma_state <= DMA_WRITE;
                     byte_count <= 0;
@@ -212,12 +181,15 @@ module openPolarisDMACore #(
                     dma_a_size <= size_store;
                     dma_a_valid <= 1;
                     byte_count <= byte_count + (dma_a_size >= 2 ? 4 : dma_a_size == 1 ? 2 : 1);
+                    
                 end
                 else if (byte_count==count_store) begin
                     if (dma_d_ready&dma_d_valid&(dma_d_opcode==0)) begin
+                        current_destination_address <= current_destination_address + minimum_bytes_r;
+                        bytesRemaining <= bytesRemaining - minimum_bytes_r;
                         dma_state <= DMA_READ;
                     end
-                    dma_a_valid <= 0;
+                    dma_a_valid <= dma_a_ready ? 0 : dma_a_valid;
                 end
             end
         endcase
