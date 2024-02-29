@@ -2,11 +2,11 @@
 /* verilator lint_off WIDTHTRUNC */
 module TileLink1toN #(
     parameter N = 2,
-    parameter [(32*N)-1:0] slave_addresses = {
+    parameter [(TL_AW*N)-1:0] slave_addresses = {
         32'h00001000,
         32'h00002000
     }, //! Base addresses of mentioned slaves
-    parameter [(32*N)-1:0] slave_end_addresses = {
+    parameter [(TL_AW*N)-1:0] slave_end_addresses = {
         32'h00002000,
         32'h10000000
     },
