@@ -61,27 +61,27 @@ module TileLinkMtoN #(
     input   wire logic [N-1:0]                      slave_d_valid,
     output  wire logic [N-1:0]                      slave_d_ready
 );
-    wire [3*(N)-1:0]              interconnect_slave_a_opcode [0:M-1];
-    wire [3*(N)-1:0]              interconnect_slave_a_param [0:M-1];
-    wire [(N*TL_SZ)-1:0]          interconnect_slave_a_size[0:M-1];
-    wire [(N*TL_RS)-1:0]          interconnect_slave_a_source[0:M-1];
-    wire [(TL_AW*N)-1:0]          interconnect_slave_a_address[0:M-1];
-    wire [(N*TL_DW/8)-1:0]        interconnect_slave_a_mask[0:M-1];
-    wire [N*TL_DW-1:0]            interconnect_slave_a_data[0:M-1];
-    wire [N-1:0]                  interconnect_slave_a_corrupt[0:M-1];
-    wire [N-1:0]                  interconnect_slave_a_valid[0:M-1];
-    wire [N-1:0]                  interconnect_slave_a_ready[0:M-1];
-    wire [(N*3)-1:0]              interconnect_slave_d_opcode[0:M-1];
-    wire [(N*2)-1:0]              interconnect_slave_d_param[0:M-1];
-    wire [(N*TL_SZ)-1:0]          interconnect_slave_d_size[0:M-1];
-    wire [(N*TL_RS)-1:0]          interconnect_slave_d_source[0:M-1];
-    wire [N-1:0]                  interconnect_slave_d_denied[0:M-1];
-    wire [N*TL_DW-1:0]            interconnect_slave_d_data[0:M-1];
-    wire [N-1:0]                  interconnect_slave_d_corrupt[0:M-1];
-    wire [N-1:0]                  interconnect_slave_d_valid[0:M-1];
-    wire [N-1:0]                  interconnect_slave_d_ready[0:M-1];
+    wire [3*(N+1)-1:0]                  interconnect_slave_a_opcode [0:M-1];
+    wire [3*(N+1)-1:0]                  interconnect_slave_a_param [0:M-1];
+    wire [((N+1)*TL_SZ)-1:0]            interconnect_slave_a_size[0:M-1];
+    wire [((N+1)*TL_RS)-1:0]            interconnect_slave_a_source[0:M-1];
+    wire [(TL_AW*(N+1))-1:0]            interconnect_slave_a_address[0:M-1];
+    wire [((N+1)*TL_DW/8)-1:0]          interconnect_slave_a_mask[0:M-1];
+    wire [(N+1)*TL_DW-1:0]              interconnect_slave_a_data[0:M-1];
+    wire [N:0]                          interconnect_slave_a_corrupt[0:M-1];
+    wire [N:0]                          interconnect_slave_a_valid[0:M-1];
+    wire [N:0]                          interconnect_slave_a_ready[0:M-1];
+    wire [((N+1)*3)-1:0]                interconnect_slave_d_opcode[0:M-1];
+    wire [((N+1)*2)-1:0]                interconnect_slave_d_param[0:M-1];
+    wire [((N+1)*TL_SZ)-1:0]            interconnect_slave_d_size[0:M-1];
+    wire [((N+1)*TL_RS)-1:0]            interconnect_slave_d_source[0:M-1];
+    wire [N:0]                          interconnect_slave_d_denied[0:M-1];
+    wire [(N+1)*TL_DW-1:0]              interconnect_slave_d_data[0:M-1];
+    wire [N:0]                          interconnect_slave_d_corrupt[0:M-1];
+    wire [N:0]                          interconnect_slave_d_valid[0:M-1];
+    wire [N:0]                          interconnect_slave_d_ready[0:M-1];
     for (genvar i = 0; i < M; i++) begin : generate1toNLinks
-        TileLink1toN #(N, slave_addresses, slave_end_addresses,
+        TileLink1toN #(N+1, slave_addresses, slave_end_addresses,
         TL_DW,TL_AW,TL_RS, TL_SZ) tilelink1toN (tilelink_clock_i, tilelink_reset_i,
             master_a_opcode[3*(i+1)-1:3*i], master_a_param[3*(i+1)-1:3*i], master_a_size[TL_SZ*(i+1)-1:TL_SZ*i],
             master_a_source[TL_RS*(i+1)-1:TL_RS*i], master_a_address[TL_AW*(i+1)-1:TL_AW*i], master_a_mask[(TL_DW/8)*(i+1)-1:(TL_DW/8)*i],
@@ -95,27 +95,27 @@ module TileLinkMtoN #(
     end
 
     // Now we have generated 1 to N links, we must transform them and turn them into M to 1 links
-    wire [3*(M)-1:0]              interconnect_master_a_opcode [0:N-1];
-    wire [3*(M)-1:0]              interconnect_master_a_param [0:N-1];
-    wire [(M*TL_SZ)-1:0]          interconnect_master_a_size[0:N-1];
-    wire [(M*TL_RS)-1:0]          interconnect_master_a_source[0:N-1];
-    wire [(TL_AW*M)-1:0]          interconnect_master_a_address[0:N-1];
-    wire [(M*TL_DW/8)-1:0]        interconnect_master_a_mask[0:N-1];
-    wire [M*TL_DW-1:0]            interconnect_master_a_data[0:N-1];
-    wire [M-1:0]                  interconnect_master_a_corrupt[0:N-1];
-    wire [M-1:0]                  interconnect_master_a_valid[0:N-1];
-    wire [M-1:0]                  interconnect_master_a_ready[0:N-1];
-    wire [(M*3)-1:0]              interconnect_master_d_opcode[0:N-1];
-    wire [(M*2)-1:0]              interconnect_master_d_param[0:N-1];
-    wire [(M*TL_SZ)-1:0]          interconnect_master_d_size[0:N-1];
-    wire [(M*TL_RS)-1:0]          interconnect_master_d_source[0:N-1];
-    wire [M-1:0]                  interconnect_master_d_denied[0:N-1];
-    wire [M*TL_DW-1:0]            interconnect_master_d_data[0:N-1];
-    wire [M-1:0]                  interconnect_master_d_corrupt[0:N-1];
-    wire [M-1:0]                  interconnect_master_d_valid[0:N-1];
-    wire [M-1:0]                  interconnect_master_d_ready[0:N-1];
+    wire [3*(M)-1:0]              interconnect_master_a_opcode [0:N];
+    wire [3*(M)-1:0]              interconnect_master_a_param [0:N];
+    wire [(M*TL_SZ)-1:0]          interconnect_master_a_size[0:N];
+    wire [(M*TL_RS)-1:0]          interconnect_master_a_source[0:N];
+    wire [(TL_AW*M)-1:0]          interconnect_master_a_address[0:N];
+    wire [(M*TL_DW/8)-1:0]        interconnect_master_a_mask[0:N];
+    wire [M*TL_DW-1:0]            interconnect_master_a_data[0:N];
+    wire [M-1:0]                  interconnect_master_a_corrupt[0:N];
+    wire [M-1:0]                  interconnect_master_a_valid[0:N];
+    wire [M-1:0]                  interconnect_master_a_ready[0:N];
+    wire [(M*3)-1:0]              interconnect_master_d_opcode[0:N];
+    wire [(M*2)-1:0]              interconnect_master_d_param[0:N];
+    wire [(M*TL_SZ)-1:0]          interconnect_master_d_size[0:N];
+    wire [(M*TL_RS)-1:0]          interconnect_master_d_source[0:N];
+    wire [M-1:0]                  interconnect_master_d_denied[0:N];
+    wire [M*TL_DW-1:0]            interconnect_master_d_data[0:N];
+    wire [M-1:0]                  interconnect_master_d_corrupt[0:N];
+    wire [M-1:0]                  interconnect_master_d_valid[0:N];
+    wire [M-1:0]                  interconnect_master_d_ready[0:N];
     for (genvar x = 0; x < M; x++) begin : transform_x
-        for (genvar y = 0; y < N; y++) begin : tranform_y
+        for (genvar y = 0; y < N+1; y++) begin : tranform_y
             assign interconnect_master_a_opcode[y][3*(x+1)-1:x*3] = interconnect_slave_a_opcode[x][3*(y+1)-1:y*3];
             assign interconnect_master_a_param[y][3*(x+1)-1:x*3] = interconnect_slave_a_param[x][3*(y+1)-1:y*3];
             assign interconnect_master_a_size[y][TL_SZ*(x+1)-1:x*TL_SZ] = interconnect_slave_a_size[x][TL_SZ*(y+1)-1:y*TL_SZ];
@@ -166,4 +166,53 @@ module TileLinkMtoN #(
             slave_d_denied[i], slave_d_data[TL_DW*(i+1)-1:TL_DW*i], slave_d_corrupt[i], slave_d_valid[i], slave_d_ready[i]
         );
     end
+    TileLinkMto1 #(M, TL_DW, TL_AW, TL_RS, TL_SZ) denialMto1 (
+        tilelink_clock_i, tilelink_reset_i, 
+        interconnect_master_a_opcode[N],
+        interconnect_master_a_param[N],
+        interconnect_master_a_size[N],
+        interconnect_master_a_source[N],
+        interconnect_master_a_address[N],
+        interconnect_master_a_mask[N],
+        interconnect_master_a_data[N],
+        interconnect_master_a_corrupt[N],
+        interconnect_master_a_valid[N],
+        interconnect_master_a_ready[N],
+        interconnect_master_d_opcode[N],
+        interconnect_master_d_param[N],
+        interconnect_master_d_size[N],
+        interconnect_master_d_source[N],
+        interconnect_master_d_denied[N],
+        interconnect_master_d_data[N],
+        interconnect_master_d_corrupt[N],
+        interconnect_master_d_valid[N],
+        interconnect_master_d_ready[N],
+        denial_a_opcode, denial_a_param, denial_a_size, denial_a_source, denial_a_address, denial_a_mask, denial_a_data, denial_a_corrupt,
+        denial_a_valid, denial_a_ready, denial_d_opcode, denial_d_param, denial_d_size, denial_d_source, denial_d_denied, denial_d_data, denial_d_corrupt, denial_d_valid,
+        denial_d_ready 
+    );
+    wire logic [2:0]                    denial_a_opcode;
+    wire logic [2:0]                    denial_a_param;
+    wire logic [3:0]                    denial_a_size;
+    wire logic [(TL_RS+$clog2(M))-1:0]  denial_a_source;
+    wire logic [TL_AW-1:0]              denial_a_address;
+    wire logic [(TL_DW/8) - 1:0]        denial_a_mask;
+    wire logic [TL_DW-1:0]              denial_a_data;
+    wire logic                          denial_a_corrupt;
+    wire logic                          denial_a_valid;
+    wire logic                          denial_a_ready;
+    wire logic [2:0]                    denial_d_opcode;
+    wire logic [1:0]                    denial_d_param;
+    wire logic [3:0]                    denial_d_size;
+    wire logic [(TL_RS+$clog2(M))-1:0]  denial_d_source;
+    wire logic                          denial_d_denied;
+    wire logic [TL_DW-1:0]              denial_d_data;
+    wire logic                          denial_d_corrupt;
+    wire logic                          denial_d_valid;
+    wire logic                          denial_d_ready;
+    denial #(((TL_RS+$clog2(M))), TL_AW, TL_DW) denial0 (
+        tilelink_clock_i, tilelink_reset_i, denial_a_opcode, denial_a_param, denial_a_size, denial_a_source, denial_a_address, denial_a_mask, denial_a_data, denial_a_corrupt,
+        denial_a_valid, denial_a_ready, denial_d_opcode, denial_d_param, denial_d_size, denial_d_source, denial_d_denied, denial_d_data, denial_d_corrupt, denial_d_valid,
+        denial_d_ready 
+    );
 endmodule

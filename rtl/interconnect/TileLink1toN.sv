@@ -1,12 +1,12 @@
 /* verilator lint_off WIDTHEXPAND */
 /* verilator lint_off WIDTHTRUNC */
 module TileLink1toN #(
-    parameter N = 2,
-    parameter [(TL_AW*N)-1:0] slave_addresses = {
+    parameter N = 3,
+    parameter [(TL_AW*(N-1))-1:0] slave_addresses = {
         32'h00001000,
         32'h00002000
     }, //! Base addresses of mentioned slaves
-    parameter [(TL_AW*N)-1:0] slave_end_addresses = {
+    parameter [(TL_AW*(N-1))-1:0] slave_end_addresses = {
         32'h00002000,
         32'h10000000
     },
@@ -95,11 +95,13 @@ module TileLink1toN #(
             master_a_corrupt
         }, master_a_valid
     );
-    wire [N-1:0] slave_select;
-    for (genvar x = 0; x < N; x++) begin : address_decode
-        assign slave_select[x] = ((slave_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]<=working_master_a_address)&&(slave_end_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]>working_master_a_address)&working_master_a_valid);
+    wire [N-2:0] slave_decode;
+    for (genvar x = 0; x < N-1; x++) begin : address_decode
+        assign slave_decode[x] = ((slave_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]<=working_master_a_address)&&(slave_end_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]>working_master_a_address)&working_master_a_valid);
     end
-
+    wire [N-1:0] slave_select;
+    assign slave_select = slave_decode[N-2:0];
+    assign slave_select = ~(|slave_decode);
     assign master_stalled = |(slave_select&~slave_a_ready);
 
     for (genvar i = 0; i < N; i++) begin : slaveRequest
