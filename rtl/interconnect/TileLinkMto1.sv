@@ -132,9 +132,9 @@ module TileLinkMto1 #(
     end
 
 
-    reg [M-1:0] block; //! When a slave responds at the same time as others, a slave is selected, which can respond and the others are stalled,
+    reg [M-1:0] block = 0; //! When a slave responds at the same time as others, a slave is selected, which can respond and the others are stalled,
                          //! Then the slave is blocked to let other slaves respond until no more conflicts are found, hence the register is reset
-    reg lock; reg [M-1:0] locked_master_select;
+    reg lock = 0; reg [M-1:0] locked_master_select = 0;
     logic [2:0] resp_opcode;
     logic [2:0] resp_param;
     logic [TL_SZ-1:0] resp_size;
@@ -143,7 +143,7 @@ module TileLinkMto1 #(
     logic [TL_DW/8-1:0] resp_mask;
     logic [TL_AW-1:0] resp_address;
     logic resp_corrupt;
-    reg [11:0] burst_counters;
+    reg [11:0] burst_counters = 0;
     logic once;
     wire burst = once&slave_a_ready&(resp_size>{$clog2((TL_DW)/8)})&&(resp_opcode!=4)|lock;
     wire burst_ending = burst_counters==0 && lock && once;

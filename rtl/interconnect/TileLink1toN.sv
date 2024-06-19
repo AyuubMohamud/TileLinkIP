@@ -100,8 +100,8 @@ module TileLink1toN #(
         assign slave_decode[x] = ((slave_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]<=working_master_a_address)&&(slave_end_addresses[(TL_AW*(x+1))-1:(TL_AW*x)]>working_master_a_address)&working_master_a_valid);
     end
     wire [N-1:0] slave_select;
-    assign slave_select = slave_decode[N-2:0];
-    assign slave_select = ~(|slave_decode);
+    assign slave_select[N-2:0] = slave_decode[N-2:0];
+    assign slave_select[N-1] = ~(|slave_decode);
     assign master_stalled = |(slave_select&~slave_a_ready);
 
     for (genvar i = 0; i < N; i++) begin : slaveRequest
@@ -147,9 +147,9 @@ module TileLink1toN #(
     end
 
 
-    reg [N-1:0] block; //! When a slave responds at the same time as others, a slave is selected, which can respond and the others are stalled,
+    reg [N-1:0] block = 0; //! When a slave responds at the same time as others, a slave is selected, which can respond and the others are stalled,
                          //! Then the slave is blocked to let other slaves respond until no more conflicts are found, hence the register is reset
-    reg lock; reg [N-1:0] locked_slave_select;
+    reg lock=0; reg [N-1:0] locked_slave_select=0;
     logic [2:0] resp_opcode;
     logic [1:0] resp_param;
     logic [TL_SZ-1:0] resp_size;
@@ -157,7 +157,7 @@ module TileLink1toN #(
     logic [TL_DW-1:0] resp_data;
     logic resp_denied;
     logic resp_corrupt;
-    reg [11:0] burst_counters;
+    reg [11:0] burst_counters = 0;
     logic once;
     wire burst = once&master_d_ready&(resp_size>{$clog2((TL_DW)/8)})&(resp_opcode==1)|lock; // bursts are from the slave
     wire burst_ending = burst_counters==0 && lock && once;
