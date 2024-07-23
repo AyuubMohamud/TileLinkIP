@@ -45,9 +45,9 @@ module openPolarisSPIFlash #(parameter TL_RS = 3) (
     wire tx, enqueue, busy; wire [31:0] data;
     flashphy S25FL127S (flash_clock_i, tx, working_address, working_size, busy, enqueue, data, flash_cs_n, flash_mosi, flash_miso, flash_sck);
     assign tx = working_valid&!busy&!taking_request;
-    wire full, read, empty; wire [31:0] fifo_data;
+    wire full, read, empty; wire [31:0] fifo_data; wire underflow, overflow;
     assign read = !empty&flash_d_ready;
-    sfifoSP #(.FW(128),.DW(32)) flashfifo (flash_clock_i, flash_reset_i, enqueue, data, full, read, fifo_data, empty);
+    sfifo #(.FW(128),.DW(32)) flashfifo (flash_clock_i, flash_reset_i, enqueue, data, full, read, fifo_data, empty, underflow, overflow);
     always_ff @(posedge flash_clock_i) begin
         taking_request <= taking_request ? !(empty&!busy) : working_valid&!busy;
         if (working_valid&!taking_request) begin

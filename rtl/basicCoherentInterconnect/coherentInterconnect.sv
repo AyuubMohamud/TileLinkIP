@@ -92,8 +92,15 @@ module coherentInterconnect #(parameter TL_AW = 28,
     assign coherentMaster_e_ready = 'hF;
     assign coherentMaster_c_ready = 'hF;
 
+    generate if (TL_C_M > 1) begin
+        
+    end else begin
+        
+    end
+    endgenerate
+
     localparam coherence_idle = 3'b000;
     
-    reg [2:0] coherence_fsm;
+    reg [2:0] coherence_fsm = coherence_idle;
 
 endmodule

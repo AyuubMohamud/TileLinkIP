@@ -9,7 +9,7 @@ module openPolarisPWM #(
     input   wire logic [2:0]                    pwm_a_param,
     input   wire logic [3:0]                    pwm_a_size,
     input   wire logic [TL_RS-1:0]              pwm_a_source,
-    input   wire logic                          pwm_a_address,
+    input   wire logic [2:0]                    pwm_a_address,
     input   wire logic [3:0]                    pwm_a_mask,
     input   wire logic [31:0]                   pwm_a_data,
     /* verilator lint_off UNUSEDSIGNAL */
@@ -43,10 +43,10 @@ module openPolarisPWM #(
     wire [31:0] working_data;
     wire [3:0] working_mask;
     wire [2:0] working_opcode;
-    wire working_address;
+    wire [2:0] working_address;
     wire [2:0] working_param;
     wire working_valid;
-    skdbf #(TL_RS+4+42+1) skidbuffer (pwm_clock_i, pwm_reset_i, ~pwm_d_ready, {
+    skdbf #(TL_RS+4+42+3) skidbuffer (pwm_clock_i, pwm_reset_i, ~pwm_d_ready, {
         working_source,
         working_size,
         working_data,
@@ -59,7 +59,7 @@ module openPolarisPWM #(
     }, pwm_a_valid);
     assign pwm_a_ready = ~pwm_busy;
     reg [13:0] cfg_pwm;
-    wire write_en = working_valid&pwm_d_ready&(pwm_a_address)&(pwm_a_opcode==3'd1||pwm_a_opcode==3'd0);
+    wire write_en = working_valid&pwm_d_ready&(working_address[2])&(working_opcode==3'd1||working_opcode==3'd0);
     wire full;
     wire sample_accept;
     wire [7:0] sample_data;
@@ -72,7 +72,7 @@ module openPolarisPWM #(
         if (pwm_reset_i) begin
             cfg_pwm <= 0;
         end
-        else if (working_valid&pwm_d_ready&!(pwm_a_address)&(pwm_a_opcode==3'd1||pwm_a_opcode==3'd0)) begin
+        else if (working_valid&pwm_d_ready&!(working_address[2])&(working_opcode==3'd1||working_opcode==3'd0)) begin
             cfg_pwm <= working_data[13:0];
         end
     end
@@ -81,7 +81,7 @@ module openPolarisPWM #(
         if (pwm_reset_i) begin
             pwm_d_valid <= 1'b0;
         end else if (working_valid&pwm_d_ready) begin
-            pwm_d_data <= working_address ? {30'h0, full, empty} : {18'd0, cfg_pwm};
+            pwm_d_data <= working_address[2] ? {30'h0, full, empty} : {18'd0, cfg_pwm};
             pwm_d_denied <= 0;
             pwm_d_corrupt <= 0;
             pwm_d_opcode <= {2'd0,working_opcode==3'd4};

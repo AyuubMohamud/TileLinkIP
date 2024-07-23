@@ -20,7 +20,7 @@ module flashphy (
     localparam flash_tx = 2'b10;
     localparam flash_rx = 2'b11;
     reg [1:0] flash_fsm;
-    initial flash_fsm = flash_idle;
+    initial flash_fsm = flash_init;
     reg [3:0] flash_size = 0;
     reg [11:0] cmd = 0;
     logic [11:0] bits;
