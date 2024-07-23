@@ -1,12 +1,11 @@
+/* verilator lint_off WIDTHEXPAND */
+/* verilator lint_off WIDTHTRUNC */
 module coherentInterconnect #(parameter TL_AW = 28, 
                               parameter TL_RS = 3,
                               parameter TL_UH_M = 1, 
                               parameter TL_UL_M = 1,
-                              parameter TL_C_M = 1,
-                              parameter TL_DW = 128,
-                              parameter enableUncacheableRegions = 0,
-                              parameter [TL_AW-1:0] cacheable_start = 0,
-                              parameter [TL_AW-1:0] cacheable_end = 0) (
+                              parameter TL_C_M = 2,
+                              parameter TL_DW = 128) (
     input   wire logic                                                  interconnect_clock_i,
     input   wire logic                                                  interconnect_reset_i,
     input   wire logic [3*((TL_UH_M + TL_UL_M + TL_C_M))-1:0]           interconnect_a_opcode,
@@ -39,32 +38,45 @@ module coherentInterconnect #(parameter TL_AW = 28,
     output       logic [TL_C_M-1:0]                                     coherentMaster_b_corrupt,
     output       logic [TL_C_M-1:0]                                     coherentMaster_b_valid,
     input   wire logic [TL_C_M-1:0]                                     coherentMaster_b_ready,
+    /* verilator lint_off UNUSEDSIGNAL */
     input   wire logic [(TL_C_M*3)-1:0]                                 coherentMaster_c_opcode,
     input   wire logic [(TL_C_M*2)-1:0]                                 coherentMaster_c_param,
     input   wire logic [(TL_C_M*4)-1:0]                                 coherentMaster_c_size,
-    input   wire logic [TL_AW-1:0]                                      coherentMaster_c_address,
+    input   wire logic [TL_C_M-1:0]                                     coherentMaster_c_denied,
     input   wire logic [(TL_C_M*TL_DW)-1:0]                             coherentMaster_c_data,
     input   wire logic [TL_C_M-1:0]                                     coherentMaster_c_corrupt,
+    /* verilator lint_on UNUSEDSIGNAL */
     input   wire logic [TL_C_M-1:0]                                     coherentMaster_c_valid,
     output  wire logic [TL_C_M-1:0]                                     coherentMaster_c_ready,
     input   wire logic [TL_C_M-1:0]                                     coherentMaster_e_valid,
     output  wire logic [TL_C_M-1:0]                                     coherentMaster_e_ready,
 
-    output      logic [27:0]                                            app_addr,
-    output      logic [2:0]                                             app_cmd,
-    output      logic                                                   app_en,
-    output      logic [127:0]                                           app_wdf_data,
-    output      logic                                                   app_wdf_end,
-    output      logic [15:0]                                            app_wdf_mask,
-    output      logic                                                   app_wdf_wren,
-    input  wire logic [127:0]                                           app_rd_data,
-    input  wire logic                                                   app_rd_data_end,
-    input  wire logic                                                   app_rd_data_valid,
-    input  wire logic                                                   app_rdy,
-    input  wire logic                                                   app_wdf_rdy
+    output       logic [2:0]                                            memory_a_opcode,
+    output       logic [2:0]                                            memory_a_param,
+    output       logic [3:0]                                            memory_a_size,
+    output       logic                                                  memory_a_source,
+    output       logic [TL_AW-1:0]                                      memory_a_address,
+    output       logic [TL_DW/8-1:0]                                    memory_a_mask,
+    output       logic [TL_DW-1:0]                                      memory_a_data,
+    output       logic                                                  memory_a_corrupt,
+    output       logic                                                  memory_a_valid,
+    input   wire logic                                                  memory_a_ready,
+
+    input   wire logic [2:0]                                            memory_d_opcode,
+    input   wire logic [1:0]                                            memory_d_param,
+    input   wire logic [3:0]                                            memory_d_size,
+    input   wire logic                                                  memory_d_source,
+    input   wire logic                                                  memory_d_denied,
+    input   wire logic [TL_DW-1:0]                                      memory_d_data,
+    input   wire logic                                                  memory_d_corrupt,
+    input   wire logic                                                  memory_d_valid,
+    output  wire logic                                                  memory_d_ready
 );
+    localparam ACQUIREBLOCK = 3'd6;
+    localparam GET = 3'd4;
 
     wire logic [2:0]                    slave_a_opcode;
+    /* verilator lint_off UNUSEDSIGNAL */
     wire logic [2:0]                    slave_a_param;
     wire logic [3:0]                    slave_a_size;
     wire logic [($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:0] slave_a_source;
@@ -72,16 +84,17 @@ module coherentInterconnect #(parameter TL_AW = 28,
     wire logic [(TL_DW/8)-1:0]          slave_a_mask;
     wire logic [TL_DW-1:0]              slave_a_data;
     wire logic                          slave_a_corrupt;
+    /* verilator lint_on UNUSEDSIGNAL */
     wire logic                          slave_a_valid;
     wire logic                          slave_a_ready;
-    wire logic [2:0]                    slave_d_opcode;
-    wire logic [1:0]                    slave_d_param;
-    wire logic [3:0]                    slave_d_size;
-    wire logic [($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:0]  slave_d_source;
-    wire logic                          slave_d_denied;
-    wire logic [TL_DW-1:0]              slave_d_data;
-    wire logic                          slave_d_corrupt;
-    wire logic                          slave_d_valid;
+    logic [2:0]                         slave_d_opcode;
+    logic [1:0]                         slave_d_param;
+    logic [3:0]                         slave_d_size;
+    logic [($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:0]  slave_d_source;
+    logic                               slave_d_denied;
+    logic [TL_DW-1:0]                   slave_d_data;
+    logic                               slave_d_corrupt;
+    logic                               slave_d_valid;
     wire logic                          slave_d_ready;
     TileLinkMto1 #(.M(TL_UH_M + TL_UL_M + TL_C_M), .TL_DW(TL_DW), .TL_AW(TL_AW), .TL_RS(TL_RS), .TL_SZ(4)) arbiter (interconnect_clock_i, interconnect_reset_i, interconnect_a_opcode,
     interconnect_a_param, interconnect_a_size, interconnect_a_source, interconnect_a_address, interconnect_a_mask, interconnect_a_data, interconnect_a_corrupt, 
@@ -90,17 +103,204 @@ module coherentInterconnect #(parameter TL_AW = 28,
     slave_a_mask, slave_a_data, slave_a_corrupt, slave_a_valid, slave_a_ready, slave_d_opcode, slave_d_param, slave_d_size, slave_d_source, slave_d_denied, slave_d_data, 
     slave_d_corrupt, slave_d_valid, slave_d_ready);
     assign coherentMaster_e_ready = 'hF;
-    assign coherentMaster_c_ready = 'hF;
+    /* verilator lint_off UNUSEDSIGNAL */
+    wire [2:0]                  working_memory_d_opcode;
+    wire [1:0]                  working_memory_d_param;
+    wire [3:0]                  working_memory_d_size;
+    wire                        working_memory_d_source;
+    wire                        working_memory_d_denied;
+    wire [TL_DW-1:0]            working_memory_d_data;
+    wire                        working_memory_d_corrupt;
+    /* verilator lint_on UNUSEDSIGNAL */
+    wire                        working_memory_d_valid;
+    wire                        master_d_busy;
+    assign memory_d_ready = ~master_d_busy;
+    skdbf #(.DW(140)) ddr3skid (interconnect_clock_i, interconnect_reset_i, !slave_d_ready, {working_memory_d_opcode,
+    working_memory_d_param,
+    working_memory_d_size,
+    working_memory_d_source,
+    working_memory_d_denied,
+    working_memory_d_data,
+    working_memory_d_corrupt}, working_memory_d_valid, master_d_busy, {memory_d_opcode,
+    memory_d_param,
+    memory_d_size,
+    memory_d_source,
+    memory_d_denied,
+    memory_d_data,
+    memory_d_corrupt}, memory_d_valid);
 
-    generate if (TL_C_M > 1) begin
-        
-    end else begin
-        
+    logic [2:0]                         coherence_b_opcode;
+    logic [2:0]                         coherence_b_param;
+    logic [3:0]                         coherence_b_size;
+    logic [TL_AW-1:0]                   coherence_b_address;
+    logic [TL_DW/8-1:0]                 coherence_b_mask;
+    logic [TL_DW-1:0]                   coherence_b_data;
+    logic                               coherence_b_corrupt;
+    logic                               coherence_b_valid;
+    wire logic                          coherence_b_ready;
+    reg memory_response = 0;
+    assign                              coherentMaster_c_ready = (&coherentMaster_c_valid)&memory_response;
+    
+    generate if (TL_C_M > 1) begin : _ml
+        TileLinkBC #(TL_C_M, TL_DW, TL_AW, 4) Deserialise (interconnect_clock_i, interconnect_reset_i,
+        coherence_b_opcode, coherence_b_param, coherence_b_size, coherence_b_address, coherence_b_mask, coherence_b_data, coherence_b_corrupt, 
+        coherence_b_valid, coherence_b_ready, coherentMaster_b_opcode, coherentMaster_b_param, coherentMaster_b_size, 
+        coherentMaster_b_address, coherentMaster_b_mask, coherentMaster_b_data, coherentMaster_b_corrupt, coherentMaster_b_valid, coherentMaster_b_ready);
+    end else begin : case_of_one
+        assign coherentMaster_b_opcode=coherence_b_opcode;
+        assign coherentMaster_b_param=coherence_b_param;
+        assign coherentMaster_b_size=coherence_b_size;
+        assign coherentMaster_b_address=coherence_b_address;
+        assign coherentMaster_b_mask=coherence_b_mask;
+        assign coherentMaster_b_data=coherence_b_data;
+        assign coherentMaster_b_corrupt=coherence_b_corrupt;
+        assign coherentMaster_b_valid=coherence_b_valid;
+        assign coherence_b_ready=coherentMaster_b_ready;
     end
     endgenerate
 
-    localparam coherence_idle = 3'b000;
-    
-    reg [2:0] coherence_fsm = coherence_idle;
+    localparam interconnect_coherence_idle = 3'b000;
+    localparam interconnect_read_memory = 3'b001;
+    localparam interconnect_write_memory = 3'b010;
+    localparam interconnect_await_ack = 3'b011;
+    reg [2:0] interconnect_coherence_fsm = interconnect_coherence_idle;
+    assign slave_a_ready = interconnect_coherence_fsm!=interconnect_coherence_idle;
+    reg [($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:0] source = 0;
+    reg [3:0] size = 0; reg [11:0] counter = 0;
+    logic [11:0] number_to_write;
 
+    always_comb begin
+        case (slave_a_size)
+            4'd0: begin // 1 byte
+                number_to_write = 0;
+            end 
+            4'd1: begin // 2 bytes
+                number_to_write = 0;
+            end
+            4'd2: begin // 4 bytes
+                number_to_write = 0;
+            end 
+            4'd3: begin // 8 bytes
+                number_to_write = 0; // Minus 2 as when we have recieved 
+            end
+            4'd4: begin // 16 bytes
+                number_to_write = TL_DW >= 128 ? 12'd0 : 128/TL_DW - 1;
+            end
+            4'd5: begin // 32 bytes
+                number_to_write = TL_DW >= 256 ? 12'd0 : 256/TL_DW - 1;
+            end
+            4'd6: begin // 64 bytes
+                number_to_write = 512/TL_DW - 1;
+            end
+            4'd7: begin // 128 bytes
+                number_to_write = 1024/TL_DW - 1;
+            end
+            4'd8: begin // 256 bytes
+                number_to_write = 2048/TL_DW - 1;
+            end
+            4'd9: begin // 512 bytes
+                number_to_write = 4096/TL_DW - 1;
+            end
+            4'd10: begin // 1 kilobyte
+                number_to_write = 8192/TL_DW - 1;
+            end
+            4'd11: begin // 2 kilobytes
+                number_to_write = 16384/TL_DW - 1;
+            end
+            4'd12: begin // 4 kilobytes
+                number_to_write = 32768/TL_DW - 1;
+            end
+            default: begin
+                number_to_write = 12'd0;
+            end
+        endcase
+    end
+    always_ff @(posedge interconnect_clock_i) begin
+        case (interconnect_coherence_fsm)
+            interconnect_coherence_idle: begin
+                slave_d_valid <= slave_d_ready ? 1'b0 : slave_d_valid;
+                if (slave_a_valid) begin
+                    if (slave_a_opcode==ACQUIREBLOCK) begin
+                        // Note, this can never be for an uncacheable block (obviously)
+                        interconnect_coherence_fsm <= interconnect_read_memory;
+                        memory_a_address <= slave_a_address;
+                        memory_a_opcode <= 3'd4;
+                        memory_a_size <= 4'd7;
+                        memory_a_source <= 0;
+                        memory_a_corrupt <= 0;
+                        memory_a_param <= 0;
+                        memory_a_valid <= 1;
+                    end else if (slave_a_opcode==GET) begin
+                        interconnect_coherence_fsm <= interconnect_read_memory;
+                        memory_a_address <= slave_a_address;
+                        memory_a_opcode <= 3'd4;
+                        memory_a_size <= slave_a_size;
+                        memory_a_source <= 0;
+                        memory_a_corrupt <= 0;
+                        memory_a_valid <= 1;
+                    end else begin
+                        interconnect_coherence_fsm <= interconnect_write_memory;
+                        memory_a_address <= slave_a_address;
+                        memory_a_opcode <= 3'd4;
+                        memory_a_size <= slave_a_size;
+                        memory_a_source <= 0;
+                        memory_a_corrupt <= 0;
+                        memory_a_mask <= slave_a_mask;
+                        memory_a_data <= slave_a_data;
+                        memory_a_valid <= 1;
+                        coherence_b_opcode <= 0;
+                        coherence_b_param <= 0;
+                        coherence_b_size <= slave_a_size;
+                        coherence_b_address <= slave_a_address;
+                        coherence_b_mask <= slave_a_mask;
+                        coherence_b_data <= slave_a_data;
+                        coherence_b_corrupt <= 0;
+                        coherence_b_valid <= 1;
+                    end
+                    source <= slave_a_source;
+                    size <= slave_a_size;
+                    counter <= number_to_write;
+                end
+            end
+            interconnect_read_memory: begin
+                memory_a_valid <= memory_a_ready ? 1'b0 : memory_a_valid;
+                if (working_memory_d_valid&(!slave_d_valid|slave_d_ready)) begin
+                    slave_d_valid <= 1;
+                    slave_d_data <= working_memory_d_data;
+                    slave_d_denied <= 0; slave_d_corrupt <= 0; slave_d_param <= 0;
+                    slave_d_source <= source; slave_d_size <= size;
+                    slave_d_opcode <= 1;
+                end else if ((!slave_d_valid|slave_d_ready)) begin
+                    slave_d_valid <= 0;
+                end
+                if ((counter==0)&working_memory_d_valid&(!slave_d_valid|slave_d_ready)) begin
+                    interconnect_coherence_fsm <= interconnect_await_ack;
+                end else if (working_memory_d_valid&(!slave_d_valid|slave_d_ready)) begin
+                    counter <= counter - 1;
+                end
+            end
+            interconnect_write_memory: begin
+                memory_a_valid <= memory_a_ready ? 1'b0 : memory_a_valid;
+                coherence_b_valid <= coherence_b_ready ? 1'b0 : coherence_b_valid;
+                if (working_memory_d_valid) begin
+                    memory_response <= 1;
+                end
+                if (coherentMaster_c_ready) begin
+                    memory_response <= 0;
+                    interconnect_coherence_fsm <= interconnect_await_ack;
+                end
+            end
+            interconnect_await_ack: begin
+                slave_d_valid <= slave_d_ready ? 1'b0 : slave_d_valid;
+                if (|coherentMaster_e_valid) begin
+                    interconnect_coherence_fsm <= interconnect_coherence_idle;
+                end
+            end
+            default: begin
+                
+            end
+        endcase
+    end
 endmodule
+/* verilator lint_on WIDTHEXPAND */
+/* verilator lint_on WIDTHTRUNC */
