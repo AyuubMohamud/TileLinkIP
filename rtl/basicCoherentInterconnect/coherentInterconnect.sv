@@ -74,11 +74,15 @@ module coherentInterconnect #(parameter TL_AW = 28,
 );
     localparam ACQUIREBLOCK = 3'd6;
     localparam GET = 3'd4;
-
+    reg [TL_AW-7:0] reserved_address [0:TL_C_M-1];
+    reg [TL_C_M-1:0] reservation_valid;
     wire logic [2:0]                    slave_a_opcode;
     /* verilator lint_off UNUSEDSIGNAL */
     wire logic [2:0]                    slave_a_param;
-    wire logic [3:0]                    slave_a_size;
+    wire logic [3:0]                    slave_a_size; 
+    /**
+        IMPORTANT WARNING: TL_C_M is ASSUMED to be the first TL_C_M IDs after TL_RS
+    **/
     wire logic [($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:0] slave_a_source;
     wire logic [TL_AW-1:0]              slave_a_address;
     wire logic [(TL_DW/8)-1:0]          slave_a_mask;
@@ -96,6 +100,7 @@ module coherentInterconnect #(parameter TL_AW = 28,
     logic                               slave_d_corrupt;
     logic                               slave_d_valid;
     wire logic                          slave_d_ready;
+
     TileLinkMto1 #(.M(TL_UH_M + TL_UL_M + TL_C_M), .TL_DW(TL_DW), .TL_AW(TL_AW), .TL_RS(TL_RS), .TL_SZ(4)) arbiter (interconnect_clock_i, interconnect_reset_i, interconnect_a_opcode,
     interconnect_a_param, interconnect_a_size, interconnect_a_source, interconnect_a_address, interconnect_a_mask, interconnect_a_data, interconnect_a_corrupt, 
     interconnect_a_valid, interconnect_a_ready, interconnect_d_opcode, interconnect_d_param, interconnect_d_size, interconnect_d_source, interconnect_d_denied, 
@@ -139,7 +144,12 @@ module coherentInterconnect #(parameter TL_AW = 28,
     logic                               coherence_b_valid;
     wire logic                          coherence_b_ready;
     reg memory_response = 0;
-    assign                              coherentMaster_c_ready = (&coherentMaster_c_valid)&memory_response;
+    generate
+        for (genvar i = 0; i < TL_C_M; i++) begin : _
+            assign coherentMaster_c_ready[i] = (&coherentMaster_c_valid)&memory_response;
+        end
+    endgenerate
+    
     
     generate if (TL_C_M > 1) begin : _ml
         TileLinkBC #(TL_C_M, TL_DW, TL_AW, 4) Deserialise (interconnect_clock_i, interconnect_reset_i,
@@ -162,13 +172,43 @@ module coherentInterconnect #(parameter TL_AW = 28,
     localparam interconnect_coherence_idle = 3'b000;
     localparam interconnect_read_memory = 3'b001;
     localparam interconnect_write_memory = 3'b010;
-    localparam interconnect_await_ack = 3'b011;
+    localparam interconnect_await_ack = 3'b111;
+    localparam interconnect_read_atomic = 3'b100;
+    localparam interconnect_write_atomic = 3'b101;
+
     reg [2:0] interconnect_coherence_fsm = interconnect_coherence_idle;
     assign slave_a_ready = interconnect_coherence_fsm!=interconnect_coherence_idle;
     reg [($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:0] source = 0;
-    reg [3:0] size = 0; reg [11:0] counter = 0;
+    reg [3:0] size = 0; reg [11:0] counter = 0; reg lr_sc = 0;
+    reg [TL_DW-1:0] saved_data = 0; reg [2:0] saved_opcode = 0; reg [2:0] saved_param = 0;
     logic [11:0] number_to_write;
-
+    wire [TL_C_M-1:0] grant_reservation;
+    wire [TL_C_M-1:0] invalidate_reservation;
+    wire [TL_C_M-1:0] successful_invalidate;
+    generate
+        for (genvar i = 0; i < TL_C_M; i++) begin : drive_reservations
+            assign grant_reservation[i] = (interconnect_coherence_fsm==interconnect_read_memory)&(source[($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:TL_RS]==TL_C_M)&(lr_sc);
+            assign invalidate_reservation[i] = (interconnect_coherence_fsm==interconnect_write_memory||
+            interconnect_coherence_fsm==interconnect_write_atomic)&(memory_a_address[TL_AW-1:7]==reserved_address[i])
+            && ((source[($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:TL_RS]!=TL_C_M)||((source[($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:TL_RS]==TL_C_M)&lr_sc));
+            assign successful_invalidate[i] = (interconnect_coherence_fsm==interconnect_write_memory||
+            interconnect_coherence_fsm==interconnect_write_atomic)&(memory_a_address[TL_AW-1:7]==reserved_address[i])
+            &&(source[($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:TL_RS]==TL_C_M)&lr_sc&&reservation_valid[i];
+            always_ff @(posedge interconnect_clock_i) begin
+                if (interconnect_reset_i) begin
+                    reserved_address[i] <= 0;
+                    reservation_valid[i] <= 0;
+                end else begin
+                    if (grant_reservation[i]) begin
+                        reserved_address[i] <= memory_a_address;
+                        reservation_valid[i] <= 1;
+                    end else if (invalidate_reservation[i]) begin
+                        reservation_valid[i] <= 0;
+                    end
+                end
+            end
+        end
+    endgenerate
     always_comb begin
         case (slave_a_size)
             4'd0: begin // 1 byte
@@ -215,6 +255,20 @@ module coherentInterconnect #(parameter TL_AW = 28,
             end
         endcase
     end
+    /**
+        How AMOs work:
+
+        AMO Request comes here after CPU invalidates its own copy of cache line -> This fsm does the operation with the CPU provided data,
+        goes through to DDR3
+
+        This interconnect extends TileLink with the following:
+        PutFullData with param = 1 is a store-conditional
+        Get with param = 1 is a load-reserved
+
+    **/
+    wire [TL_DW-1:0] atom_result;
+    atomalu #(.TL_DW(TL_DW)) alu (saved_opcode, saved_param, saved_data, working_memory_d_data, atom_result);
+    wire origin_uncached = source[($clog2(TL_UH_M + TL_UL_M + TL_C_M)+TL_RS)-1:TL_RS]>($clog2(TL_C_M)-1);
     always_ff @(posedge interconnect_clock_i) begin
         case (interconnect_coherence_fsm)
             interconnect_coherence_idle: begin
@@ -238,10 +292,11 @@ module coherentInterconnect #(parameter TL_AW = 28,
                         memory_a_source <= 0;
                         memory_a_corrupt <= 0;
                         memory_a_valid <= 1;
-                    end else begin
+                        lr_sc <= slave_a_param[0];
+                    end else if (slave_a_opcode==3'd0) begin
                         interconnect_coherence_fsm <= interconnect_write_memory;
                         memory_a_address <= slave_a_address;
-                        memory_a_opcode <= 3'd4;
+                        memory_a_opcode <= 3'd0;
                         memory_a_size <= slave_a_size;
                         memory_a_source <= 0;
                         memory_a_corrupt <= 0;
@@ -256,6 +311,16 @@ module coherentInterconnect #(parameter TL_AW = 28,
                         coherence_b_data <= slave_a_data;
                         coherence_b_corrupt <= 0;
                         coherence_b_valid <= 1;
+                    end else begin
+                        memory_a_address <= slave_a_address;
+                        memory_a_opcode <= 3'd4;
+                        memory_a_size <= slave_a_size;
+                        memory_a_source <= 0;
+                        memory_a_corrupt <= 0;
+                        memory_a_mask <= slave_a_mask;
+                        memory_a_data <= slave_a_data;
+                        memory_a_valid <= 1;
+                        interconnect_coherence_fsm <= interconnect_read_atomic;
                     end
                     source <= slave_a_source;
                     size <= slave_a_size;
@@ -274,7 +339,8 @@ module coherentInterconnect #(parameter TL_AW = 28,
                     slave_d_valid <= 0;
                 end
                 if ((counter==0)&working_memory_d_valid&(!slave_d_valid|slave_d_ready)) begin
-                    interconnect_coherence_fsm <= interconnect_await_ack;
+                    interconnect_coherence_fsm <= origin_uncached ? interconnect_coherence_idle : interconnect_await_ack;
+                    lr_sc <= 0;
                 end else if (working_memory_d_valid&(!slave_d_valid|slave_d_ready)) begin
                     counter <= counter - 1;
                 end
@@ -286,8 +352,55 @@ module coherentInterconnect #(parameter TL_AW = 28,
                     memory_response <= 1;
                 end
                 if (coherentMaster_c_ready) begin
+                    lr_sc <= 0;
                     memory_response <= 0;
-                    interconnect_coherence_fsm <= interconnect_await_ack;
+                    slave_d_valid <= 1;
+                    slave_d_data <= 0;
+                    slave_d_denied <= lr_sc&!(|successful_invalidate); slave_d_corrupt <= 0; slave_d_param <= 0;
+                    slave_d_source <= source; slave_d_size <= size;
+                    slave_d_opcode <= 0;
+                    interconnect_coherence_fsm <= origin_uncached ? interconnect_coherence_idle : interconnect_await_ack;
+                    lr_sc <= 0;
+                end
+            end
+            interconnect_read_atomic: begin
+                memory_a_valid <= memory_a_ready ? 1'b0 : memory_a_valid;
+                if (working_memory_d_valid) begin
+                    interconnect_coherence_fsm <= interconnect_write_atomic;
+                    memory_a_address <= slave_a_address;
+                    memory_a_opcode <= 3'd0;
+                    memory_a_size <= $clog2(TL_DW/8);
+                    memory_a_source <= 0;
+                    memory_a_corrupt <= 0;
+                    memory_a_mask <= 'hF;
+                    memory_a_data <= atom_result;
+                    memory_a_valid <= 1;
+                    saved_data <= working_memory_d_data;
+                    coherence_b_opcode <= 0;
+                    coherence_b_param <= 0;
+                    coherence_b_size <= $clog2(TL_DW/8);
+                    coherence_b_address <= memory_a_address;
+                    coherence_b_mask <= 'hF;
+                    coherence_b_data <= atom_result;
+                    coherence_b_corrupt <= 0;
+                    coherence_b_valid <= 1;
+                end
+            end
+            interconnect_write_atomic: begin
+                memory_a_valid <= memory_a_ready ? 1'b0 : memory_a_valid;
+                coherence_b_valid <= coherence_b_ready ? 1'b0 : coherence_b_valid;
+                if (working_memory_d_valid) begin
+                    memory_response <= 1;
+                end
+                if (coherentMaster_c_ready) begin
+                    memory_response <= 0;
+                    slave_d_valid <= 1;
+                    slave_d_data <= saved_data;
+                    slave_d_denied <= 0; slave_d_corrupt <= 0; slave_d_param <= 0;
+                    slave_d_source <= source; slave_d_size <= size;
+                    slave_d_opcode <= 1;
+                    interconnect_coherence_fsm <= origin_uncached ? interconnect_coherence_idle : interconnect_await_ack;
+                    lr_sc <= 0;
                 end
             end
             interconnect_await_ack: begin
