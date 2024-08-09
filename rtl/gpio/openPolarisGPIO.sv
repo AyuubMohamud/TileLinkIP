@@ -1,4 +1,4 @@
-module openPolarisGPIO #(parameter TL_RS = 4, parameter NGPIO = 16,
+module openPolarisGPIO #(parameter TL_RS = 4, parameter [5:0] NGPIO = 16,
 parameter rise_interrupts = 1, parameter fall_interrupts = 1) (
     input   wire logic                          gpio_clock_i,
     input   wire logic                          gpio_reset_i,

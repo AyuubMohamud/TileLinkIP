@@ -1,13 +1,11 @@
-module openPolarisDMACore #(
-    parameter TL_AW = 32
-) (
+module openPolarisDMACore (
     input   wire logic                          dmac_clock_i,
-    input   wire logic                          dmac_reset_i,
 
     input   wire logic                          dmac_tx_i,
-    input   wire logic [TL_AW-1:0]              dmac_source_address_i,
-    input   wire logic [TL_AW-1:0]              dmac_dest_address_i,
-    input   wire logic [TL_AW-1:0]              dmac_bytes_tx_i,
+    input   wire logic [31:0]                   dmac_source_address_i,
+    input   wire logic [31:0]                   dmac_dest_address_i,
+    input   wire logic [31:0]                   dmac_bytes_tx_i,
+    input   wire logic [1:0]                    dmac_max_size_i,
     output  wire logic                          dmac_busy_o,
     output       logic                          dmac_done_o,
     output       logic                          dmac_err_o,
@@ -15,16 +13,17 @@ module openPolarisDMACore #(
     output       logic [2:0]                    dma_a_opcode,
     output       logic [2:0]                    dma_a_param,
     output       logic [3:0]                    dma_a_size,
-    output       logic [TL_AW-1:0]              dma_a_address,
+    output       logic [31:0]                   dma_a_address,
     output       logic [3:0]                    dma_a_mask,
     output       logic [31:0]                   dma_a_data,
     output       logic                          dma_a_corrupt,
     output       logic                          dma_a_valid,
     input   wire logic                          dma_a_ready,
-
+    /* verilator lint_off UNUSEDSIGNAL */
     input   wire logic [2:0]                    dma_d_opcode,
     input   wire logic [1:0]                    dma_d_param,
     input   wire logic [3:0]                    dma_d_size,
+    /* verilator lint_on UNUSEDSIGNAL */
     input   wire logic                          dma_d_denied,
     input   wire logic [31:0]                   dma_d_data,
     input   wire logic                          dma_d_corrupt,
@@ -32,152 +31,75 @@ module openPolarisDMACore #(
     output  wire logic                          dma_d_ready
 );
     assign dma_d_ready = 1;
-    reg [TL_AW-1:0] bytesRemaining; // for not crossing cache line reasons maximum burst request size is 128 bytes
+    reg [31:0] bytesRemaining = 0;
+    reg [31:0] nxtSource = 0;
+    reg [31:0] nxtDest = 0;
 
-    wire write_fifo = dma_d_ready&dma_d_valid&(dma_d_opcode==1);
-    wire full;
-    wire read_fifo;
-    wire [31:0] read_data;
-    wire empty;
-    sfifo #(.DW(32), .FW(32)) fifo (dmac_clock_i, dmac_reset_i, write_fifo, dma_d_data, full, read_fifo, read_data, empty);
-    // Notably DMAable regions of memory support the kinds of accesses supported by tilelink
-    reg [TL_AW-1:0] current_source_address;
-    reg [TL_AW-1:0] current_destination_address;
+    localparam dma_idle = 2'd0;
+    localparam dma_read = 2'd1;
+    localparam dma_write = 2'd2;
+    localparam dma_await = 2'd3;
+    reg [1:0] dma_state = dma_idle;
 
-    reg [1:0] dma_state;
-    localparam IDLE = 2'b00;
-    localparam DMA_READ = 2'b01;
-    localparam DMA_AWAIT = 2'b10;
-    localparam DMA_WRITE = 2'b11;
-
-    logic [3:0] max_burst_size_from_dest_addr;
-    logic [TL_AW-1:0] bytes_0;
-    assign dmac_busy_o = dma_state!=IDLE;
-    always_comb begin
-        casez (current_destination_address[6:0])
-            7'bzzzzzz1: begin
-                max_burst_size_from_dest_addr = 4'd0;
-                bytes_0 = 1;
-            end
-            7'bzzzzz10: begin
-                max_burst_size_from_dest_addr = 4'd1;
-                bytes_0 = 2;
-            end
-            7'bzzzz100: begin
-                max_burst_size_from_dest_addr = 4'd2;
-                bytes_0 = 4;
-            end
-            default: begin
-                max_burst_size_from_dest_addr = 4'd7;
-                bytes_0 = 128;
-            end
-        endcase
-    end
-    logic [3:0] max_burst_size_from_src_addr;
-    logic [TL_AW-1:0] bytes_1;
-    always_comb begin
-        casez (current_source_address[6:0])
-            7'bzzzzzz1: begin
-                max_burst_size_from_src_addr = 4'd0;
-                bytes_1 = 1;
-            end
-            7'bzzzzz10: begin
-                max_burst_size_from_src_addr = 4'd1;
-                bytes_1 = 2;
-            end
-            default: begin
-                max_burst_size_from_src_addr = 4'd7; bytes_1 = 128;
-            end
-        endcase
-    end
-    logic [3:0] max_burst_size_from_remainder;
-    logic [TL_AW-1:0] bytes_2;
-    assign max_burst_size_from_remainder = bytesRemaining==1 ? 4'd0 : bytesRemaining<4 ? 4'd1 : bytesRemaining<8 ? 4'd2 : bytesRemaining<16 ? 4'd3 : bytesRemaining<32 ?
-    4'd4 : bytesRemaining<64 ? 4'd5 : bytesRemaining<128 ? 4'd6 : 4'd7;
-    assign bytes_2 = bytesRemaining==1 ? 1 : bytesRemaining<4 ? 2 : bytesRemaining<8 ? 4 : bytesRemaining<16 ? 8 : bytesRemaining<32 ?
-    16 : bytesRemaining<64 ? 32 : bytesRemaining<128 ? 64 : 128;
-    wire [3:0] min_stage1 = max_burst_size_from_dest_addr < max_burst_size_from_src_addr ? max_burst_size_from_dest_addr : max_burst_size_from_src_addr;
-    wire [3:0] minimum = max_burst_size_from_remainder < min_stage1 ? max_burst_size_from_remainder : min_stage1;
-    wire [TL_AW-1:0] min_stage1_bsize = max_burst_size_from_dest_addr < max_burst_size_from_src_addr ? bytes_0 : bytes_1;
-    wire [TL_AW-1:0] minimum_bytes = max_burst_size_from_remainder < min_stage1 ? bytes_2 : min_stage1_bsize;
-    reg [7:0] byte_count;
-    reg [7:0] count_store;
-    reg [3:0] size_store;
-    reg [31:0] minimum_bytes_r;
-    assign read_fifo = dma_a_ready && (byte_count!=count_store);
+    wire max_is_1 = nxtDest[0]|nxtSource[0]|bytesRemaining[0]|(dmac_max_size_i==2'd0);
+    wire max_is_2 = nxtDest[1]|nxtSource[1]|bytesRemaining[1]|(dmac_max_size_i==2'd1);
+    assign dmac_busy_o = dma_state != dma_idle;
     always_ff @(posedge dmac_clock_i) begin
         case (dma_state)
-            IDLE: begin
-                dmac_done_o <= 0;
-                dmac_err_o <= 0;
+            dma_idle: begin
                 if (dmac_tx_i) begin
                     bytesRemaining <= dmac_bytes_tx_i;
-                    current_source_address <= dmac_source_address_i;
-                    current_destination_address <= dmac_dest_address_i;
-                    dma_state <= DMA_READ;
-                end
-            end
-            DMA_READ: begin
-                if (dma_a_ready && (bytesRemaining != 0)) begin
-                    dma_a_address <= current_source_address;
-                    dma_a_corrupt <= 0;
-                    dma_a_opcode <= 3'd4;
-                    dma_a_param <= 0;
-                    dma_a_data <= 0;
-                    dma_a_mask <= 0;
-                    dma_a_size <= minimum;
-                    dma_a_valid <= 1;
-                    dma_state <= DMA_AWAIT;
-                    current_source_address <= current_source_address + minimum_bytes;
-                    byte_count <= 0;
-                    count_store <= minimum_bytes[7:0];
-                    size_store <= minimum;
-                    minimum_bytes_r <= minimum_bytes;
-                end else if (bytesRemaining==0) begin
-                    dmac_done_o <= 1;
+                    nxtSource <= dmac_source_address_i;
+                    nxtDest <= dmac_dest_address_i;
+                    dma_state <= dma_read;
+                end else begin
+                    dmac_done_o <= 0;
                     dmac_err_o <= 0;
-                    dma_state <= IDLE;
                 end
             end
-            DMA_AWAIT: begin
-                dma_a_valid <= dma_a_ready ? 0 : dma_a_valid;
-                if (byte_count == count_store) begin
-                    dma_state <= DMA_WRITE;
-                    byte_count <= 0;
-                end else if (dma_d_ready&dma_d_valid&(dma_d_opcode==1)) begin
-                    byte_count <= byte_count + (dma_a_size >= 2 ? 4 : dma_a_size == 1 ? 2 : 1);
-                end else if (dma_d_ready&dma_d_valid&dma_d_denied) begin
-                    byte_count <= 0;
-                    current_destination_address <= 0;
-                    current_source_address <= 0;
-                    dmac_err_o <= 1;
-                    dma_state <= IDLE;
-                end
+            dma_read: begin
+                dma_a_address <= nxtSource;
+                dma_a_corrupt <= 0;
+                dma_a_param <= 0;
+                dma_a_opcode <= 3'd4;
+                dma_a_mask <= 0;
+                dma_a_size <= max_is_1 ? 4'd0 : max_is_2 ? 4'd1 : 4'd2;
+                dma_a_valid <= 1;
+                dma_state <= dma_write;
             end
-            DMA_WRITE: begin
-                if (dma_a_ready && (byte_count!=count_store)) begin
-                    dma_a_address <= current_destination_address;
-                    dma_a_corrupt <= 0;
-                    dma_a_data <= read_data;
-                    dma_a_mask <= 4'b1111;
-                    dma_a_opcode <= 3'd0;
-                    dma_a_param <= 0;
-                    dma_a_size <= size_store;
-                    dma_a_valid <= 1;
-                    byte_count <= byte_count + (dma_a_size >= 2 ? 4 : dma_a_size == 1 ? 2 : 1);
-                    
-                end
-                else if (byte_count==count_store) begin
-                    if (dma_d_ready&dma_d_valid&(dma_d_opcode==0)) begin
-                        current_destination_address <= current_destination_address + minimum_bytes_r;
-                        bytesRemaining <= bytesRemaining - minimum_bytes_r;
-                        dma_state <= DMA_READ;
-                    end else if (dma_d_ready&dma_d_valid&dma_d_denied) begin
-                        dma_state <= IDLE;
+            dma_write: begin
+                dma_a_valid <= dma_a_ready ? 1'b0 : dma_a_valid;
+                if (dma_d_valid) begin
+                    if (dma_d_denied|dma_d_corrupt) begin
                         dmac_err_o <= 1;
                         dmac_done_o <= 1;
+                        dma_state <= dma_idle;
+                    end else begin
+                        dma_a_data <= dma_d_data;
+                        dma_a_address <= nxtSource;
+                        dma_a_corrupt <= 0;
+                        dma_a_param <= 0;
+                        dma_a_opcode <= 3'd4;
+                        dma_a_mask <= 4'hF;
+                        dma_a_size <= max_is_1 ? 4'd0 : max_is_2 ? 4'd1 : 4'd2;
+                        dma_a_valid <= 1;
+                        nxtSource <= nxtSource + (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
+                        nxtDest <= nxtDest + (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
+                        bytesRemaining <= bytesRemaining - (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
+                        dma_state <= dma_await;
                     end
-                    dma_a_valid <= dma_a_ready ? 0 : dma_a_valid;
+                end
+            end
+            dma_await: begin
+                dma_a_valid <= dma_a_ready ? 1'b0 : dma_a_valid;
+                if (dma_d_valid) begin
+                    if (dma_d_denied|dma_d_corrupt|(bytesRemaining==0)) begin
+                        dmac_err_o <= dma_d_denied|dma_d_corrupt;
+                        dmac_done_o <= 1;
+                        dma_state <= dma_idle;
+                    end else begin
+                        dma_state <= dma_read;
+                    end
                 end
             end
         endcase
