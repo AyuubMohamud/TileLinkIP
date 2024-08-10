@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2023
+// Licensed under CERN-OHL-P version 2
 module skdbf #(parameter DW = 8) (
     input   wire logic          clk_i,
     input   wire logic          reset_i,

@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module openPolarisSRAM #(
     parameter TL_RS = 4,
     parameter TL_AW = 16,

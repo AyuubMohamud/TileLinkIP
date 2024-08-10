@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module openPolarisGPIO #(parameter TL_RS = 4, parameter [5:0] NGPIO = 16,
 parameter rise_interrupts = 1, parameter fall_interrupts = 1) (
     input   wire logic                          gpio_clock_i,

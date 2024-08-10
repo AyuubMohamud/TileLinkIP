@@ -43,7 +43,7 @@ module openPolarisSPIFlash #(parameter TL_RS = 3) (
     assign flash_a_ready = ~flash_busy;
 
     wire tx, enqueue, busy; wire [31:0] data;
-    flashphy S25FL127S (flash_clock_i, tx, working_address, working_size, busy, enqueue, data, flash_cs_n, flash_mosi, flash_miso, flash_sck);
+    flashphy genericFlash (flash_clock_i, tx, working_address, working_size, busy, enqueue, data, flash_cs_n, flash_mosi, flash_miso, flash_sck);
     assign tx = working_valid&!busy&!taking_request;
     wire full, read, empty; wire [31:0] fifo_data; wire underflow, overflow;
     assign read = !empty&flash_d_ready;

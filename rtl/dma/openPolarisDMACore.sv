@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module openPolarisDMACore (
     input   wire logic                          dmac_clock_i,
 

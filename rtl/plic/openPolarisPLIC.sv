@@ -1,4 +1,4 @@
-// Copyright (C) Ayuub Mohamud, 2023
+// Copyright (C) Ayuub Mohamud, 2024
 // Licensed under CERN-OHL-P version 2
 module openPolarisPLIC #(parameter TL_RS = 4) (
     input   wire logic                          plic_clock_i,
@@ -30,7 +30,7 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
 
     input   wire logic [30:0]                   int_i, //! No gateway needed, only one interrupt is performed per peripheral
 
-    output  wire logic [3:0]                    int_o
+    output  wire logic [1:0]                    int_o
 );
     wire plic_busy;
     wire [TL_RS-1:0] working_source;
@@ -54,33 +54,33 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
     }, plic_a_valid);
     assign plic_a_ready = !plic_busy;
     reg [31:0] source_priority;
-    reg [31:0] int_enable [0:3];
-    reg priority_threshold [0:3];
+    reg [31:0] int_enable [0:1];
+    reg priority_threshold [0:1];
     always_ff @(posedge plic_clock_i) begin
         if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:12]==0)) begin
             source_priority[working_address[6:2]] <= working_address[6:2] == 0 ? 0 : working_data[0];
         end
         if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:12]==10'd2)) begin
-            int_enable[working_address[8:7]] <= working_data&32'hFFFFFFFE;
+            int_enable[working_address[7]] <= working_data&32'hFFFFFFFE;
         end
         if (working_valid&plic_d_ready&(working_opcode==3'd0)&(working_address[21:16]==6'b100000)&(!working_address[2])) begin
-            priority_threshold[working_address[13:12]] <= working_data[0];
+            priority_threshold[working_address[12]] <= working_data[0];
         end
     end
 
 
-    reg [4:0] claim [0:3];
+    reg [4:0] claim [0:1];
     wire [31:0] interrupt_pending = {
         int_i, 1'b0
     };
-    logic [31:0] claim_block [0:3];
-    for (genvar i = 0; i < 4; i++) begin : percontext
+    logic [31:0] claim_block [0:1];
+    for (genvar i = 0; i < 2; i++) begin : percontext
         for (genvar x = 0; x < 32; x++) begin : perbit
             assign claim_block[i][x] = claim[i]==x;
         end
     end
-    logic [4:0] res [0:3];
-    for (genvar i = 0; i < 4; i++) begin : genClaimLogic
+    logic [4:0] res [0:1];
+    for (genvar i = 0; i < 2; i++) begin : genClaimLogic
         always_comb begin 
             casez (int_enable[i]&~claim_block[i]&interrupt_pending)
                 32'bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz10: res[i] = 1;
@@ -123,10 +123,10 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
     always_comb begin
         case (working_address[2])
             1'b0: begin
-                context_specific_read = {31'h0, priority_threshold[working_address[13:12]]};
+                context_specific_read = {31'h0, priority_threshold[working_address[12]]};
             end
             1'b1: begin
-                context_specific_read = {27'h0, res[working_address[13:12]]};
+                context_specific_read = {27'h0, res[working_address[12]]};
             end
         endcase
     end
@@ -138,10 +138,10 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
                 generic_read = {31'h0, source_priority[working_address[6:2]]};
             end
             2'b01: begin
-                generic_read = interrupt_pending&~claim_block[0]&~claim_block[1]&~claim_block[2]&~claim_block[3];
+                generic_read = interrupt_pending&~claim_block[0]&~claim_block[1];
             end
             2'b10: begin
-                generic_read = int_enable[working_address[8:7]];
+                generic_read = int_enable[working_address[7]];
             end
             default: begin
                 generic_read = 0;
@@ -156,9 +156,9 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
 
     always_ff @(posedge plic_clock_i) begin
         if (claim_made) begin
-            claim[working_address[13:12]] <= res[working_address[13:12]];
+            claim[working_address[12]] <= res[working_address[12]];
         end else if (complete_attempted) begin
-            claim[working_address[13:12]] <= 0;
+            claim[working_address[12]] <= 0;
         end
     end
 
@@ -179,8 +179,8 @@ module openPolarisPLIC #(parameter TL_RS = 4) (
         end
     end
 
-    for (genvar i = 0; i < 4; i++) begin : generateLevelInterrupts
-        assign int_o[i] = |({32{priority_threshold[i]}}&(interrupt_pending)&int_enable[i]&source_priority&~claim_block[0]&~claim_block[1]&~claim_block[2]&~claim_block[3]);
+    for (genvar i = 0; i < 2; i++) begin : generateLevelInterrupts
+        assign int_o[i] = |({32{priority_threshold[i]}}&(interrupt_pending)&int_enable[i]&source_priority&~claim_block[0]&~claim_block[1]);
     end
 
 endmodule

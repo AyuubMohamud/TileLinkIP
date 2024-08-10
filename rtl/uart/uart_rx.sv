@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module uart_rx (
 	input wire logic i_clk,
 	input wire logic i_rx,

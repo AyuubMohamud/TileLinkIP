@@ -1,4 +1,5 @@
-`default_nettype none
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module sfifo #(parameter FW = 64, parameter DW = 8) ( // Just a circular buffer 
     input   wire logic i_clk,
     input   wire logic i_reset,

@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module TileLinktoUI #(parameter TL_RS = 4) (
     input   wire logic                          tilelink_clock_i,
     input   wire logic                          tilelink_reset_i,

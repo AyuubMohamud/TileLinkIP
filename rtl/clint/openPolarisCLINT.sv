@@ -1,6 +1,6 @@
-// Copyright (C) Ayuub Mohamud, 2023
-// Licensed under CERN-OHL-W version 2
-module openPolarisCLINT #(parameter HARTNO = 1,
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
+module openPolarisCLINT #(
     parameter TL_RS = 4
     ) (
     input   wire logic                          clint_clock_i,
@@ -30,8 +30,8 @@ module openPolarisCLINT #(parameter HARTNO = 1,
     output       logic                          clint_d_valid,
     input   wire logic                          clint_d_ready,
 
-    output  wire logic [HARTNO-1:0]             msip,
-    output  wire logic [HARTNO-1:0]             mtip          
+    output  wire logic                          msip_o,
+    output  wire logic                          mtip_o          
 );
     wire clint_busy;
     wire [TL_RS-1:0] working_source;
@@ -59,12 +59,12 @@ module openPolarisCLINT #(parameter HARTNO = 1,
     localparam CSR_MTIMEH =     16'hBFFC;
 
 
-    reg [HARTNO-1:0] msip_vector;
+    reg msip_r = 0;
 
-    reg [31:0] mtimecmpl [0:HARTNO-1];
-    reg [31:0] mtimecmph [0:HARTNO-1];
+    reg [31:0] mtimecmpl = 0;
+    reg [31:0] mtimecmph = 0;
 
-    reg [63:0] mtime;
+    reg [63:0] mtime = 0;
     always_ff @(posedge clint_clock_i) begin
         if (clint_reset_i) begin
             mtime <= 64'h0000000000000000;
@@ -87,9 +87,9 @@ module openPolarisCLINT #(parameter HARTNO = 1,
             CSR_MTIMEH:             read_machine = mtime[63:32];
             default: begin
                 if (msip_accessed) begin
-                    read_machine = {31'h00000000, msip_vector[working_address[HARTNO==1 ? 2 : $clog2(HARTNO)+1:2]]};
+                    read_machine = {31'h00000000, msip_r};
                 end else begin
-                    read_machine = working_address[2] ? mtimecmph[working_address[HARTNO==1 ? 3 :$clog2(HARTNO)+2:3]] : mtimecmph[working_address[HARTNO==1 ? 3 :$clog2(HARTNO)+2:3]];
+                    read_machine = working_address[2] ? mtimecmph : mtimecmph;
                 end
             end
         endcase
@@ -123,10 +123,10 @@ module openPolarisCLINT #(parameter HARTNO = 1,
             working_opcode==0
             ||working_opcode==1)) begin
                 if (msip_accessed) begin
-                    msip_vector[working_address[HARTNO==1 ? 2 : $clog2(HARTNO)+1:2]] <= write_value_machine[0];
+                    msip_r <= write_value_machine[0];
                 end else if (working_address<16'hBFF8) begin
-                    mtimecmph[working_address[HARTNO==1 ? 3 :$clog2(HARTNO)+2:3]] <= working_address[3] ? write_value_machine : mtimecmph[working_address[HARTNO==1 ? 3 :$clog2(HARTNO)+2:3]];
-                    mtimecmpl[working_address[HARTNO==1 ? 3 :$clog2(HARTNO)+2:3]] <= !working_address[3] ? write_value_machine : mtimecmpl[working_address[HARTNO==1 ? 3 :$clog2(HARTNO)+2:3]];
+                    mtimecmph <= working_address[3] ? write_value_machine : mtimecmph;
+                    mtimecmpl <= !working_address[3] ? write_value_machine : mtimecmpl;
                 end
         end
     end
@@ -146,8 +146,10 @@ module openPolarisCLINT #(parameter HARTNO = 1,
             clint_d_valid <= 1'b0;
         end
     end
-    assign msip = msip_vector;
-    for (genvar i = 0; i < HARTNO; i++) begin : time_comparison
-        assign mtip[i] = mtime >= {mtimecmph[i], mtimecmpl[i]};
+    assign msip_o = msip_r;
+    reg mtip_r = 0;
+    always_ff @(posedge clint_clock_i) begin
+        mtip_r <= mtime >= {mtimecmph, mtimecmpl};
     end
+    assign mtip_o = mtip_r;
 endmodule

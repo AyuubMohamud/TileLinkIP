@@ -1,3 +1,12 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
+/**
+    Configurable baud rate UART controller:
+    Bit 0: Transmit not full interrupt
+    Bit 1: Recieve not empty interrupt
+    Bit 2: RX & TX enable
+    Bit 14 to 3: Clock divider in terms of SYS_CLK/(BAUD_RATE)
+**/
 module openPolarisUART #(
     parameter TL_RS = 4,
     parameter TL_SZ = 4
@@ -112,33 +121,4 @@ module openPolarisUART #(
         end
     end
     assign irq_o = (!rxempty&polarisUartCSR[1])|(!txfull&polarisUartCSR[0]);
-`ifdef FORMAL
-    wire [TL_RS:0] outstanding;
-    tlul_slave_formal #(.AW(4), .RS(TL_RS), .MAX(10)) formal (
-        uart_clock_i,
-        uart_reset_i,
-        uart_a_opcode,
-        uart_a_param,
-        uart_a_size,
-        uart_a_source,
-        uart_a_address,
-        uart_a_mask,
-        uart_a_data,
-        uart_a_corrupt,
-        uart_a_valid,
-        uart_a_ready,
-        uart_d_opcode,
-        uart_d_param,
-        uart_d_size,
-        uart_d_source,
-        uart_d_denied,
-        uart_d_data,
-        uart_d_corrupt,
-        uart_d_valid,
-        uart_d_ready,
-        outstanding
-    );
-
-
-`endif
 endmodule

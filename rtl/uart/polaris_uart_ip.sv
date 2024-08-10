@@ -1,4 +1,5 @@
-`default_nettype none
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module polaris_uart_ip (
     input   wire logic                  uart_clk_i,
     input   wire logic                  uart_rst_i,

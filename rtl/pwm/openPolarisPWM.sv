@@ -1,3 +1,5 @@
+// Copyright (C) Ayuub Mohamud, 2024
+// Licensed under CERN-OHL-P version 2
 module openPolarisPWM #(
     parameter TL_RS = 4
 ) (
