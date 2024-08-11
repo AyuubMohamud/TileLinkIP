@@ -2,7 +2,7 @@
 // Licensed under CERN-OHL-P version 2
 module openPolarisDMA
 #(
-    parameter NoC = 2, //! Number of channels to generate
+    parameter NoC = 1, //! Number of channels to generate
     parameter TL_RS = 4
 )
 (
@@ -62,6 +62,7 @@ module openPolarisDMA
     //! DMANEXTDEST = DMA_BASE + (0x80*CNO) + 0x08
     //! DMANEXTSIZE = DMA_BASE + (0x80*CNO) + 0x0C
     //! DMATX = DMA_BASE + (0x80*CNO) + 0x10
+    localparam channelGen = $clog2(NoC)==0 ? 1 : $clog2(NoC);
     wire dma_busy;
     wire [TL_RS-1:0] working_source;
     wire [3:0] working_size;
@@ -86,7 +87,13 @@ module openPolarisDMA
     reg [31:0] dmasrc [0:NoC-1];
     reg [31:0] dmadest [0:NoC-1];
     reg [31:0] dmasize [0:NoC-1];
-    wire [$clog2(NoC)-1:0] referenced_core = working_address[$clog2(NoC*('h80))-1:$clog2(('h80))];
+    wire [channelGen-1:0] referenced_core;
+    generate if (NoC<2) begin
+        assign referenced_core = 0;
+    end else begin
+        assign referenced_core = working_address[$clog2(NoC*('h80))-1:$clog2(('h80))];
+    end
+    endgenerate
     wire [NoC-1:0] start;
     wire [NoC-1:0] busy;
     wire [NoC-1:0] done;
@@ -113,7 +120,7 @@ module openPolarisDMA
             dmasize[referenced_core] <= working_data;
         end
         if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h00)&(working_opcode==3'd0)) begin
-            dmactrl[referenced_core][1] <= working_data[1];
+            dmactrl[referenced_core][3:1] <= working_data[3:1];
         end
     end
     for (genvar i = 0; i < NoC; i++) begin: produceDoneLogicandIntLogic
@@ -143,7 +150,7 @@ module openPolarisDMA
             dma_d_param <= 0;
             case (working_address[$clog2('h80)-1:0])
                 'h00: begin
-                    dma_d_data <= {28'h0, busy[referenced_core], err[referenced_core], dmactrl[referenced_core]};
+                    dma_d_data <= {26'h0, busy[referenced_core], err[referenced_core], dmactrl[referenced_core]};
                     dma_d_denied <= 1'b0;
                 end
                 'h04: begin
