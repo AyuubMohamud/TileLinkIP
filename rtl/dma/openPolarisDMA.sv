@@ -22,7 +22,7 @@ module openPolarisDMA
     output  wire logic                      dma_a_ready,
 
     output  wire logic [2:0]                dma_d_opcode,
-    output  wire logic [2:0]                dma_d_param,
+    output  wire logic [1:0]                dma_d_param,
     output  wire logic [3:0]                dma_d_size,
     output  wire logic [TL_RS-1:0]          dma_d_source,
     output  wire logic                      dma_d_denied,
@@ -135,7 +135,7 @@ module openPolarisDMA
         assign irq_err_o[i] = err[i]&dmactrl[i][0];
     end
     for (genvar i = 0; i < NoC; i++) begin: generateStartCondition
-        assign start[i] = (referenced_core==i)&&dma_d_ready&&working_valid&&(working_opcode==3'd0)&&(working_address[$clog2('h80)-1:0]=='h10);
+        assign start[i] = (referenced_core==i)&&dma_d_ready&&working_valid&&(working_opcode==3'd0)&&(working_address[$clog2('h80)-1:0]=='h14);
     end
 
     always_ff @(posedge dma_clock_i) begin
@@ -167,6 +167,10 @@ module openPolarisDMA
                 end
                 'h10: begin
                     dma_d_data <= {31'h0, busy[referenced_core]};
+                    dma_d_denied <= 1'b0;
+                end
+                'h14: begin
+                    dma_d_data <= 0;
                     dma_d_denied <= 1'b0;
                 end
                 default: begin

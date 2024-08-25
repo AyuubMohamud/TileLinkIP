@@ -81,7 +81,7 @@ module openPolarisDMACore (
                         dma_a_address <= nxtSource;
                         dma_a_corrupt <= 0;
                         dma_a_param <= 0;
-                        dma_a_opcode <= 3'd4;
+                        dma_a_opcode <= 3'd0;
                         dma_a_mask <= 4'hF;
                         dma_a_size <= max_is_1 ? 4'd0 : max_is_2 ? 4'd1 : 4'd2;
                         dma_a_valid <= 1;
