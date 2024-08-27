@@ -64,11 +64,11 @@ module openPolarisPWM #(
     wire write_en = working_valid&pwm_d_ready&(working_address[2])&(working_opcode==3'd1||working_opcode==3'd0);
     wire full;
     wire sample_accept;
-    wire [7:0] sample_data;
+    wire [11:0] sample_data;
     wire empty;
     wire underflow;
     wire overflow;
-    sfifo #(.DW(8), .FW(8)) samples (pwm_clock_i, pwm_reset_i, write_en, working_data[7:0], full, sample_accept, sample_data, empty, underflow, overflow);
+    sfifo #(.DW(12), .FW(8)) samples (pwm_clock_i, pwm_reset_i, write_en, working_data[13:2], full, sample_accept, sample_data, empty, underflow, overflow);
 
     always_ff @(posedge pwm_clock_i) begin
         if (pwm_reset_i) begin
@@ -97,7 +97,7 @@ module openPolarisPWM #(
     end
     reg [11:0] counter;
     initial counter = 0;
-    reg [7:0] sample;
+    reg [11:0] sample;
     initial sample = 0;
     always_ff @(posedge pwm_clock_i) begin
         if (pwm_reset_i|cfg_pwm[0]) begin
@@ -113,6 +113,6 @@ module openPolarisPWM #(
     end
 
     assign sample_accept = counter == cfg_pwm[13:2];
-    assign pin_o = (counter[7:0] < sample);
+    assign pin_o = (counter < sample);
     assign int_o = empty&cfg_pwm[1]&cfg_pwm[0];
 endmodule

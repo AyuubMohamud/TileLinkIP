@@ -83,7 +83,7 @@ module openPolarisDMA
     }, dma_a_valid);
     assign dma_a_ready = ~dma_busy;
 
-    reg [3:0] dmactrl [0:NoC-1]; // IE, IP, RXS, TXS
+    reg [5:0] dmactrl [0:NoC-1]; // IE, IP, MAXSZ, SRCS, DSTS
     reg [31:0] dmasrc [0:NoC-1];
     reg [31:0] dmadest [0:NoC-1];
     reg [31:0] dmasize [0:NoC-1];
@@ -100,7 +100,7 @@ module openPolarisDMA
     wire [NoC-1:0] err;
     for (genvar i = 0; i < NoC; i++) begin : generateDMACores
         openPolarisDMACore core (dma_clock_i, start[i], dmasrc[i],
-        dmadest[i], dmasize[i], dmactrl[i][3:2], busy[i], done[i], err[i],
+        dmadest[i], dmasize[i], dmactrl[i][3:2], dmactrl[i][4], dmactrl[i][5], busy[i], done[i], err[i],
         sa_opcode[3*(i+1)-1:3*i], sa_param[3*(i+1)-1:3*i], sa_size[4*(i+1)-1:4*i], sa_address[32*(i+1)-1:32*i], 
         sa_mask[4*(i+1)-1:4*i], sa_data[32*(i+1)-1:32*i], sa_corrupt[i], sa_valid[i], sa_ready[i],
         sd_opcode[3*(i+1)-1:3*i], sd_param[2*(i+1)-1:2*i], sd_size[4*(i+1)-1:4*i], 
@@ -120,7 +120,7 @@ module openPolarisDMA
             dmasize[referenced_core] <= working_data;
         end
         if (dma_d_ready&working_valid&(working_address[$clog2('h80)-1:0]=='h00)&(working_opcode==3'd0)) begin
-            dmactrl[referenced_core][3:1] <= working_data[3:1];
+            dmactrl[referenced_core][5:1] <= working_data[5:1];
         end
     end
     for (genvar i = 0; i < NoC; i++) begin: produceDoneLogicandIntLogic
@@ -150,7 +150,7 @@ module openPolarisDMA
             dma_d_param <= 0;
             case (working_address[$clog2('h80)-1:0])
                 'h00: begin
-                    dma_d_data <= {26'h0, busy[referenced_core], err[referenced_core], dmactrl[referenced_core]};
+                    dma_d_data <= {24'h0, busy[referenced_core], err[referenced_core], dmactrl[referenced_core]};
                     dma_d_denied <= 1'b0;
                 end
                 'h04: begin

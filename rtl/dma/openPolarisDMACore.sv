@@ -8,6 +8,8 @@ module openPolarisDMACore (
     input   wire logic [31:0]                   dmac_dest_address_i,
     input   wire logic [31:0]                   dmac_bytes_tx_i,
     input   wire logic [1:0]                    dmac_max_size_i,
+    input   wire logic                          dmac_source_stationary_i,
+    input   wire logic                          dmac_dest_stationary_i,
     output  wire logic                          dmac_busy_o,
     output       logic                          dmac_done_o,
     output       logic                          dmac_err_o,
@@ -78,15 +80,15 @@ module openPolarisDMACore (
                         dma_state <= dma_idle;
                     end else begin
                         dma_a_data <= dma_d_data;
-                        dma_a_address <= nxtSource;
+                        dma_a_address <= nxtDest;
                         dma_a_corrupt <= 0;
                         dma_a_param <= 0;
                         dma_a_opcode <= 3'd0;
                         dma_a_mask <= 4'hF;
                         dma_a_size <= max_is_1 ? 4'd0 : max_is_2 ? 4'd1 : 4'd2;
                         dma_a_valid <= 1;
-                        nxtSource <= nxtSource + (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
-                        nxtDest <= nxtDest + (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
+                        nxtSource <= dmac_source_stationary_i ? nxtSource : nxtSource + (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
+                        nxtDest <= dmac_dest_stationary_i ? nxtDest : nxtDest + (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
                         bytesRemaining <= bytesRemaining - (max_is_1 ? 32'd1 : max_is_2 ? 32'd2 : 32'd4);
                         dma_state <= dma_await;
                     end
