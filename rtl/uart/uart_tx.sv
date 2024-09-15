@@ -16,11 +16,11 @@ module uart_tx
 
 	reg [2:0] state_machine_stage;
 	initial state_machine_stage = IDLE;
-	reg [7:0] tx_byte;
-	reg [11:0] counter;
+	reg [7:0] tx_byte = 0;
+	reg [11:0] counter = 0;
 
-	reg [2:0] bit_index;
-
+	reg [2:0] bit_index = 0;
+	initial o_uart_tx = 0;
 // TRANSMISSION VERIFIED :)
 	always_ff @(posedge i_clk) begin
 		case (state_machine_stage)

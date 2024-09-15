@@ -89,7 +89,7 @@ module openPolarisCLINT #(
                 if (msip_accessed) begin
                     read_machine = {31'h00000000, msip_r};
                 end else begin
-                    read_machine = working_address[2] ? mtimecmph : mtimecmph;
+                    read_machine = working_address[2] ? mtimecmph : mtimecmpl;
                 end
             end
         endcase
