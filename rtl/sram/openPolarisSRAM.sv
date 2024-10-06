@@ -36,7 +36,7 @@ module openPolarisSRAM #(
     reg [31:0] sram [0:2**(TL_AW-2)-1];
     generate if (LOADINITIAL) begin : loadROMfile
         initial begin
-            $readmemb(LOADFILE, sram);
+            $readmemh(LOADFILE, sram);
         end
     end
     endgenerate
