@@ -18,7 +18,7 @@ module sfifo #(parameter FW = 64, parameter DW = 8) ( // Just a circular buffer
     output  logic overflow
 );
 
-    reg [DW-1:0] fifo [0:FW-1];
+    (* ram_style = "distributed" *) reg [DW-1:0] fifo [0:FW-1];
     reg [$clog2(FW):0] read_ptr;
     reg [$clog2(FW):0] write_ptr;
 
